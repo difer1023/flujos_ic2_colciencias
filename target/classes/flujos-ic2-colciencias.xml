@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
-    <db:generic-config name="PostgreSQL" url="jdbc:postgresql://localhost:5432/ic2?user=postgres&amp;password=23101992difer" driverClassName="org.postgresql.Driver" doc:name="Generic Database Configuration"/>
+    <db:generic-config name="PostgreSQL" url="jdbc:postgresql://baasu.db.elephantsql.com:5432/ttaqadul?user=ttaqadul&amp;password=uqZ0UHZ7SeO4zqgP7JYJsPKlJ--Bggpk" driverClassName="org.postgresql.Driver" doc:name="Generic Database Configuration"/>
     <http:listener-config name="HTTP_colciencias_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
     
 </mule>

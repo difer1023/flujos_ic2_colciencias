@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:apikit-soap="http://www.mulesoft.org/schema/mule/apikit-soap" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:apikit-soap="http://www.mulesoft.org/schema/mule/apikit-soap" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
@@ -22,6 +26,12 @@ http://www.mulesoft.org/schema/mule/apikit-soap http://www.mulesoft.org/schema/m
 	                        <db:parameterized-query><![CDATA[select * from grupo_investigacion]]></db:parameterized-query>
 	                    </db:select>
 	                </processor-chain>
+	                <json:object-to-json-transformer doc:name="Object to JSON"/>
+	                <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+			        <scripting:component doc:name="Groovy">
+			            <scripting:script engine="Groovy"><![CDATA[co.com.ic2.transformers.TransformerGrupoInvestigacion.getGrupoInvestigacion(payload)]]></scripting:script>
+			        </scripting:component>
+			        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
             </when>
             <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarGrupoInvestigacion'">
 	                <processor-chain doc:name="Processor Chain">
@@ -31,8 +41,10 @@ http://www.mulesoft.org/schema/mule/apikit-soap http://www.mulesoft.org/schema/m
 	                        <db:parameterized-query><![CDATA[insert into grupo_investigacion (k_codigo,n_nombre) values(#[codigo],#[nombre])]]></db:parameterized-query>
 	                    </db:insert>
 	                </processor-chain>
+	                
+	                
             </when>
         </choice>
-        <mulexml:object-to-xml-transformer doc:name="Object to XML"/>
+        
     </flow>
 </mule>
