@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.9.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+<flow name="flujo-apoyo-programa-formacion">
+        <http:listener config-ref="HTTP_colciencias_Configuration" path="/flujoApoyoProgramaFormacion" doc:name="HTTP"/>
+        <cxf:jaxws-service  doc:name="flujoApoyoProgramaFormacion"  service="apoyoProgramaFormacionService" serviceClass="co.com.ic2.colciencias.ws.IServiceApoyoProgramaFormacion"/>
+        <choice doc:name="Choice">
+            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarApoyoProgramasFormacion'">
+	                <processor-chain doc:name="Processor Chain">
+	                    <db:select config-ref="PostgreSQL" doc:name="Database">
+	                        <db:parameterized-query><![CDATA[select * from apoyo_prog_f]]></db:parameterized-query>
+	                    </db:select>
+	                </processor-chain>
+            </when>
+            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarApoyoProgramaFormacion'">
+	                <processor-chain doc:name="Processor Chain">
+	                <set-session-variable variableName="codigo" value="#[payload[0]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="nombre" value="#[payload[1]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="institucion" value="#[payload[2]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="facultad" value="#[payload[3]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="departamento" value="#[payload[4]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="idActoAdministrativo" value="#[payload[5]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="numeroActoAdministrativo" value="#[payload[6]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="fecha" value="#[payload[7]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="tipoApoyo" value="#[payload[8]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="categoria" value="#[payload[9]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="clasificado" value="#[payload[10]]" doc:name="Session Variable"/> 
+	                    <db:insert config-ref="PostgreSQL" doc:name="Database">
+	                        <db:parameterized-query><![CDATA[insert into apoyo_prog_f (k_codigo,n_nombre,n_institucion,n_facultad,
+	                        n_departamento,n_id_acto_admin,n_num_acto_admin,i_fecha,i_tipo_apoyo,c_categoria,b_clasificado) values(#[codigo],
+	                        #[nombre],#[institucion],#[facultad],#[departamento],#[idActoAdministrativo],#[numeroActoAdministrativo],
+	                        #[fecha],#[tipoApoyo],#[categoria],#[clasificado]])]]></db:parameterized-query>
+	                    </db:insert>
+	                </processor-chain>
+            </when>
+        </choice>
+        <mulexml:object-to-xml-transformer doc:name="Object to XML"/>
+    </flow>
+</mule>

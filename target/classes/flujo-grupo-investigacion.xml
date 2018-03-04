@@ -18,7 +18,7 @@ http://www.mulesoft.org/schema/mule/apikit-soap http://www.mulesoft.org/schema/m
     <cxf:configuration name="CXF_Configuration" enableMuleSoapHeaders="true" initializeStaticBusInstance="true" doc:name="CXF Configuration"/>
     <flow name="flujo-grupo-investigacionFlow">
         <http:listener config-ref="HTTP_colciencias_Configuration" path="/flujoGrupoInvestigacion" doc:name="HTTP"/>
-        <cxf:jaxws-service  doc:name="flujoGruposInvestigacion" configuration-ref="CXF_Configuration" service="gruposInvestigacionService" serviceClass="co.com.ic2.grupoInvestigacion.ws.IServiceGrupoInvestigacion"/>
+        <cxf:jaxws-service  doc:name="flujoGruposInvestigacion" configuration-ref="CXF_Configuration" service="gruposInvestigacionService" serviceClass="co.com.ic2.colciencias.ws.IServiceGrupoInvestigacion"/>
         <choice doc:name="Choice">
             <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarGruposInvestigacion'">
 	                <processor-chain doc:name="Processor Chain">

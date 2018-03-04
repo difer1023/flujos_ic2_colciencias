@@ -19,7 +19,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     <cxf:configuration name="CXF_flujo_investigador" enableMuleSoapHeaders="true" initializeStaticBusInstance="true" doc:name="CXF flujo_investigador"/>
     <flow name="flujo-investigador">
         <http:listener config-ref="HTTP_colciencias_Configuration" path="/flujoInvestigador" doc:name="HTTP"/>
-        <cxf:jaxws-service  doc:name="flujoInvestigador"  service="investigadorService" serviceClass="co.com.ic2.investigador.ws.IServiceInvestigador"/>
+        <cxf:jaxws-service  doc:name="flujoInvestigador"  service="investigadorService" serviceClass="co.com.ic2.colciencias.ws.IServiceInvestigador"/>
         <choice doc:name="Choice">
             <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarInvestigadores'">
 	                <processor-chain doc:name="Processor Chain">
@@ -32,6 +32,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	                <processor-chain doc:name="Processor Chain">
 	                <set-session-variable variableName="codigo" value="#[payload[0]]" doc:name="Session Variable"/>
 	                <set-session-variable variableName="nombre" value="#[payload[1]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="categoria" value="#[payload[2]]" doc:name="Session Variable"/>
 	                    <db:insert config-ref="PostgreSQL" doc:name="Database">
 	                        <db:parameterized-query><![CDATA[insert into investigador (k_codigo,n_nombre,c_categoria) values(#[codigo],#[nombre],#[categoria])]]></db:parameterized-query>
 	                    </db:insert>

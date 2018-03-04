@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.9.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+<flow name="flujo-evento-cientifico">
+        <http:listener config-ref="HTTP_colciencias_Configuration" path="/flujoEventoCientifico" doc:name="HTTP"/>
+        <cxf:jaxws-service  doc:name="flujoEventoCientifico"  service="eventoCientificoService" serviceClass="co.com.ic2.colciencias.ws.IServiceEventoCientifico"/>
+        <choice doc:name="Choice">
+            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarEventosCientificos'">
+	                <processor-chain doc:name="Processor Chain">
+	                    <db:select config-ref="PostgreSQL" doc:name="Database">
+	                        <db:parameterized-query><![CDATA[select * from evento_cientifico]]></db:parameterized-query>
+	                    </db:select>
+	                </processor-chain>
+            </when>
+            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarEventoCientifico'">
+	                <processor-chain doc:name="Processor Chain">
+	                <set-session-variable variableName="codigo" value="#[payload[0]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="nombre" value="#[payload[1]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="fechaInicio" value="#[payload[2]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="fechaFin" value="#[payload[3]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="entidadPatrocinadora" value="#[payload[4]]" doc:name="Session Variable"/>
+	                <set-session-variable variableName="tipoParticipacion" value="#[payload[5]]" doc:name="Session Variable"/>
+	                    <db:insert config-ref="PostgreSQL" doc:name="Database">
+	                        <db:parameterized-query><![CDATA[insert into evento_cientifico (k_codigo,n_nombre,i_fecha_inicio,i_fecha_fin,
+	                        n_entidad_patrocinadora,i_tipo_participacion) values(#[codigo],#[nombre],#[fechaInicio],#[fechaFin],#[entidadPatrocinadora],
+	                        #[tipoParticipacion]])]]></db:parameterized-query>
+	                    </db:insert>
+	                </processor-chain>
+            </when>
+        </choice>
+        <mulexml:object-to-xml-transformer doc:name="Object to XML"/>
+    </flow>
+</mule>

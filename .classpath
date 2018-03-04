@@ -10,7 +10,8 @@
 	<classpathentry kind="src" path="src/main/api"/>
 	<classpathentry kind="src" path="src/main/wsdl"/>
 	<classpathentry kind="src" path="src/test/munit"/>
-	<classpathentry kind="lib" path="C:/Users/Difer/Desktop/UD 2017-1/proyecto de grado/mule/postgresql-42.2.1.jar"/>
 	<classpathentry kind="con" path="MULE_LIB/APIkit SOAP/org.mule.tooling.soapkit.contribution"/>
+	<classpathentry kind="lib" path="E:/mule/gson-2.8.2.jar"/>
+	<classpathentry kind="lib" path="E:/mule/postgresql-42.2.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
