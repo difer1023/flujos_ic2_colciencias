@@ -21,7 +21,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <choice doc:name="Choice">
             <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarEntidades'">
 	                <processor-chain doc:name="Processor Chain">
-	                    <db:select config-ref="PostgreSQL" doc:name="Database">
+	                    <db:select config-ref="MySQL_Configuration" doc:name="Database">
 	                        <db:parameterized-query><![CDATA[select * entidad]]></db:parameterized-query>
 	                    </db:select>
 	                </processor-chain>
@@ -31,7 +31,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	                <set-session-variable variableName="codigo" value="#[payload[0]]" doc:name="Session Variable"/>
 	                <set-session-variable variableName="nombre" value="#[payload[1]]" doc:name="Session Variable"/>
 	                <set-session-variable variableName="institucion" value="#[payload[2]]" doc:name="Session Variable"/>
-	                    <db:insert config-ref="PostgreSQL" doc:name="Database">
+	                    <db:insert config-ref="MySQL_Configuration" doc:name="Database">
 	                        <db:parameterized-query><![CDATA[insert into entidad (k_codigo,n_nombre,b_institucion) 
 	                        values(#[codigo],#[nombre],#[institucion])]]></db:parameterized-query>
 	                    </db:insert>

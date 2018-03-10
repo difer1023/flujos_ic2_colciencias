@@ -20,7 +20,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <choice doc:name="Choice">
             <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarEdiciones'">
 	                <processor-chain doc:name="Processor Chain">
-	                    <db:select config-ref="PostgreSQL" doc:name="Database">
+	                    <db:select config-ref="MySQL_Configuration" doc:name="Database">
 	                        <db:parameterized-query><![CDATA[select * from edicion]]></db:parameterized-query>
 	                    </db:select>
 	                </processor-chain>
@@ -38,7 +38,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	                <set-session-variable variableName="categoria" value="#[payload[8]]" doc:name="Session Variable"/>
 	                <set-session-variable variableName="clasificado" value="#[payload[9]]" doc:name="Session Variable"/> 
 	                <set-session-variable variableName="codigoGrupoInvestigacion" value="#[payload[10]]" doc:name="Session Variable"/>
-	                    <db:insert config-ref="PostgreSQL" doc:name="Database">
+	                    <db:insert config-ref="MySQL_Configuration" doc:name="Database">
 	                        <db:parameterized-query><![CDATA[insert into est_comunicacion_conocimiento (k_codigo,n_titulo,n_isbn,n_issn,i_editor,
 	                        i_fecha_editor,i_ano,n_pag_web,c_categoria,b_clasificado,i_cod_grupo_investigacion) values(#[codigo],#[nombre],#[isbn],#[issn],
 	                        #[editor],#[fechaEditor],#[ano],#[paginaWeb],#[categoria],#[clasificado],#[codigoGrupoInvestigacion]])]]></db:parameterized-query>

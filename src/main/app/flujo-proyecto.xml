@@ -20,7 +20,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <choice doc:name="Choice">
             <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarProyectos'">
 	                <processor-chain doc:name="Processor Chain">
-	                    <db:select config-ref="PostgreSQL" doc:name="Database">
+	                    <db:select config-ref="MySQL_Configuration" doc:name="Database">
 	                        <db:parameterized-query><![CDATA[select * from proyecto]]></db:parameterized-query>
 	                    </db:select>
 	                </processor-chain>
@@ -38,7 +38,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	                <set-session-variable variableName="tipoProyecto" value="#[payload[8]]" doc:name="Session Variable"/>
 	                <set-session-variable variableName="categoria" value="#[payload[9]]" doc:name="Session Variable"/>
 	                <set-session-variable variableName="clasificado" value="#[payload[10]]" doc:name="Session Variable"/> 
-	                    <db:insert config-ref="PostgreSQL" doc:name="Database">
+	                    <db:insert config-ref="MySQL_Configuration" doc:name="Database">
 	                        <db:parameterized-query><![CDATA[insert into proyecto (k_codigo,n_titulo,n_institucion,n_entidad_financiadora,
 	                        n_financiacion,b_acto_admin,i_ano,n_numero_contrato,i_tipo_proyecto,c_categoria,b_clasificado) values(#[codigo],
 	                        #[titulo],#[institucion],#[entidadFinanciadora],#[financiacion],#[actoAdmin],#[ano],#[numeroContrato],#[tipoProyecto],

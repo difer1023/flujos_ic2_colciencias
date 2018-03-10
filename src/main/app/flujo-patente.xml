@@ -20,7 +20,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <choice doc:name="Choice">
             <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarPatentes'">
 	                <processor-chain doc:name="Processor Chain">
-	                    <db:select config-ref="PostgreSQL" doc:name="Database">
+	                    <db:select config-ref="MySQL_Configuration" doc:name="Database">
 	                        <db:parameterized-query><![CDATA[select * from patente]]></db:parameterized-query>
 	                    </db:select>
 	                </processor-chain>
@@ -37,7 +37,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	                <set-session-variable variableName="viaObtencion" value="#[payload[7]]" doc:name="Session Variable"/>
 	                <set-session-variable variableName="examenPreliminar" value="#[payload[8]]" doc:name="Session Variable"/>
 	                <set-session-variable variableName="examenFondo" value="#[payload[9]]" doc:name="Session Variable"/> 
-	                    <db:insert config-ref="PostgreSQL" doc:name="Database">
+	                    <db:insert config-ref="MySQL_Configuration" doc:name="Database">
 	                        <db:parameterized-query><![CDATA[insert into patente (k_codigo,n_numero_patente,b_certificado_patente,i_ano_obtencion,
 	                        n_gaceta,c_categoria,b_clasificado,i_via_obtencion,b_examen_preliminar,b-examen_fondo) values(#[codigo],
 	                        #[numeroPatente],#[certificadoPatente],#[anoObtencion],#[gaceta],#[categoria],#[clasificado],

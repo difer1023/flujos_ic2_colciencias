@@ -21,7 +21,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <choice doc:name="Choice">
             <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarEventosCientificos'">
 	                <processor-chain doc:name="Processor Chain">
-	                    <db:select config-ref="PostgreSQL" doc:name="Database">
+	                    <db:select config-ref="MySQL_Configuration" doc:name="Database">
 	                        <db:parameterized-query><![CDATA[select * from evento_cientifico]]></db:parameterized-query>
 	                    </db:select>
 	                </processor-chain>
@@ -34,7 +34,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	                <set-session-variable variableName="fechaFin" value="#[payload[3]]" doc:name="Session Variable"/>
 	                <set-session-variable variableName="entidadPatrocinadora" value="#[payload[4]]" doc:name="Session Variable"/>
 	                <set-session-variable variableName="tipoParticipacion" value="#[payload[5]]" doc:name="Session Variable"/>
-	                    <db:insert config-ref="PostgreSQL" doc:name="Database">
+	                    <db:insert config-ref="MySQL_Configuration" doc:name="Database">
 	                        <db:parameterized-query><![CDATA[insert into evento_cientifico (k_codigo,n_nombre,i_fecha_inicio,i_fecha_fin,
 	                        n_entidad_patrocinadora,i_tipo_participacion) values(#[codigo],#[nombre],#[fechaInicio],#[fechaFin],#[entidadPatrocinadora],
 	                        #[tipoParticipacion]])]]></db:parameterized-query>

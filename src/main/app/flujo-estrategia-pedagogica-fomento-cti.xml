@@ -20,7 +20,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <choice doc:name="Choice">
             <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarEstrategiasPedagogicasFomentoCTI'">
 	                <processor-chain doc:name="Processor Chain">
-	                    <db:select config-ref="PostgreSQL" doc:name="Database">
+	                    <db:select config-ref="MySQL_Configuration" doc:name="Database">
 	                        <db:parameterized-query><![CDATA[select * from est_fomento_CTI]]></db:parameterized-query>
 	                    </db:select>
 	                </processor-chain>
@@ -35,7 +35,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	                <set-session-variable variableName="categoria" value="#[payload[5]]" doc:name="Session Variable"/>
 	                <set-session-variable variableName="clasificado" value="#[payload[6]]" doc:name="Session Variable"/>
 	                <set-session-variable variableName="codigoGrupoInvestigacion" value="#[payload[7]]" doc:name="Session Variable"/>
-	                    <db:insert config-ref="PostgreSQL" doc:name="Database">
+	                    <db:insert config-ref="MySQL_Configuration" doc:name="Database">
 	                        <db:parameterized-query><![CDATA[insert into est_fomento_CTI (k_codigo,n_nombre,i_fecha_inicio,i_investigador_principal,
 	                        b_certificado,c_categoria,b_clasificado,i_cod_grupo_investigacion) values(#[codigo],#[nombre],#[fechaInicio],#[investigadorPrincipal],
 	                        #[certificado],#[categoria],#[clasificado],#[codigoGrupoInvestigacion]])]]></db:parameterized-query>
