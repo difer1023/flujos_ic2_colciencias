@@ -11,5 +11,6 @@ import co.com.ic2.colciencias.gruplac.GrupoInvestigacion;
 @WebService(name="serviceGrupoInvestigacion")
 public interface IServiceGrupoInvestigacion {
 	public ArrayList<GrupoInvestigacion> consultarGruposInvestigacion();
-	public String insertarGrupoInvestigacion(@WebParam(name="nombre") String nombre);
+	public GrupoInvestigacion consultarGrupoInvestigacion(@WebParam(name="codigo") int codigo);
+	public int insertarGrupoInvestigacion(@WebParam(name="nombre") String nombre);
 }
