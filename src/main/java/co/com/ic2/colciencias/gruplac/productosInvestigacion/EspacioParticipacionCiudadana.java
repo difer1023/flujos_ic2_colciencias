@@ -13,6 +13,9 @@ public class EspacioParticipacionCiudadana extends ProductoInvestigacion{
     
     private int anoInicio;
     private String tipo;
+    
+    private String nombreComunidad;
+    private boolean constanciaParticipacion;
 
     public int getAnoInicio() {
         return anoInicio;
@@ -29,5 +32,21 @@ public class EspacioParticipacionCiudadana extends ProductoInvestigacion{
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
+
+	public String getNombreComunidad() {
+		return nombreComunidad;
+	}
+
+	public void setNombreComunidad(String nombreComunidad) {
+		this.nombreComunidad = nombreComunidad;
+	}
+
+	public boolean isConstanciaParticipacion() {
+		return constanciaParticipacion;
+	}
+
+	public void setConstanciaParticipacion(boolean constanciaParticipacion) {
+		this.constanciaParticipacion = constanciaParticipacion;
+	}
     
 }

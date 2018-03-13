@@ -5,7 +5,7 @@
  */
 package co.com.ic2.colciencias.gruplac.productosInvestigacion;
 
-import co.com.ic2.colciencias.gruplac.Integrante;
+import co.com.ic2.colciencias.gruplac.Investigador;
 import java.util.ArrayList;
 
 /**
@@ -19,8 +19,14 @@ public class Edicion extends ProductoInvestigacion{
     private String editorial;
     private String idiomas;
     private String numPaginas;
-    private ArrayList<Integrante> autores;
+    private Investigador autor;
     private String tipo;
+    
+    
+    private String isbn;
+    private String issn;
+    private String fechaEdicion;
+    private String url;
 
     public String getPais() {
         return pais;
@@ -62,12 +68,12 @@ public class Edicion extends ProductoInvestigacion{
         this.numPaginas = numPaginas;
     }
 
-    public ArrayList<Integrante> getAutores() {
-        return autores;
+    public Investigador getAutor() {
+        return autor;
     }
 
-    public void setAutores(ArrayList<Integrante> autores) {
-        this.autores = autores;
+    public void setAutor(Investigador autor) {
+        this.autor = autor;
     }
 
     public String getTipo() {
@@ -77,6 +83,36 @@ public class Edicion extends ProductoInvestigacion{
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
-    
-    
+
+	public String getIsbn() {
+		return isbn;
+	}
+
+	public void setIsbn(String isbn) {
+		this.isbn = isbn;
+	}
+
+	public String getIssn() {
+		return issn;
+	}
+
+	public void setIssn(String issn) {
+		this.issn = issn;
+	}
+
+	public String getFechaEdicion() {
+		return fechaEdicion;
+	}
+
+	public void setFechaEdicion(String fechaEdicion) {
+		this.fechaEdicion = fechaEdicion;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
 }

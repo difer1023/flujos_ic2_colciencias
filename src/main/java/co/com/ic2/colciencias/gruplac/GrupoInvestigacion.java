@@ -58,7 +58,7 @@ public class GrupoInvestigacion {
     private String programaCienciaTecnologiaSecundario;
     private ArrayList<Institucion> instituciones;
     private ArrayList<LineaInvestigacion> lineasInvestigacion;
-    private ArrayList<Integrante> integrantes;
+    private ArrayList<Investigador> integrantes;
     private ArrayList<ProductoInvestigacion> productosInvestigacion;
     private ArrayList<ArticuloInvestigacion> articulosInvestigacion;
     private ArrayList<LibroPublicado> librosResultadoInvestigacion;
@@ -212,11 +212,11 @@ public class GrupoInvestigacion {
         this.lineasInvestigacion = lineasInvestigacion;
     }
 
-    public ArrayList<Integrante> getIntegrantes() {
+    public ArrayList<Investigador> getIntegrantes() {
         return integrantes;
     }
 
-    public void setIntegrantes(ArrayList<Integrante> integrantes) {
+    public void setIntegrantes(ArrayList<Investigador> integrantes) {
         this.integrantes = integrantes;
     }
 

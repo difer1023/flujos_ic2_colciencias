@@ -9,7 +9,7 @@ package co.com.ic2.colciencias.gruplac;
  *
  * @author L
  */
-public class Integrante {
+public class Investigador {
     private String nombreCompleto;
     private String vinculacion;
     private String horasDedicacion;
