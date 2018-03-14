@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
 http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
@@ -16,30 +14,92 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 
 
 
-    <cxf:configuration name="CXF_flujo_investigador" enableMuleSoapHeaders="true" initializeStaticBusInstance="true" doc:name="CXF flujo_investigador"/>
-    <flow name="flujo-investigador">
-        <http:listener config-ref="HTTP_colciencias_Configuration" path="/flujoInvestigador" doc:name="HTTP"/>
-        <cxf:jaxws-service  doc:name="flujoInvestigador"  service="investigadorService" serviceClass="co.com.ic2.colciencias.ws.IServiceInvestigador"/>
-        <choice doc:name="Choice">
-            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarInvestigadores'">
-	                <processor-chain doc:name="Processor Chain">
-	                    <db:select config-ref="MySQL_Configuration" doc:name="Database">
-	                        <db:parameterized-query><![CDATA[select * from investigador]]></db:parameterized-query>
-	                    </db:select>
-	                </processor-chain>
-            </when>
-            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarInvestigador'">
-	                <processor-chain doc:name="Processor Chain">
-	                <set-session-variable variableName="codigo" value="#[payload[0]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="nombre" value="#[payload[1]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="categoria" value="#[payload[2]]" doc:name="Session Variable"/>
-	                    <db:insert config-ref="MySQL_Configuration" doc:name="Database">
-	                        <db:parameterized-query><![CDATA[insert into investigador (k_codigo,n_nombre,c_categoria) values(#[codigo],#[nombre],#[categoria])]]></db:parameterized-query>
-	                    </db:insert>
-	                </processor-chain>
-            </when>
-        </choice>
-        <mulexml:object-to-xml-transformer doc:name="Object to XML"/>
-    </flow>
-    
+	<cxf:configuration name="CXF_flujo_investigador"
+		enableMuleSoapHeaders="true" initializeStaticBusInstance="true"
+		doc:name="CXF flujo_investigador" />
+	<flow name="flujo-investigador">
+		<http:listener config-ref="HTTP_colciencias_Configuration"
+			path="/flujoInvestigador" doc:name="HTTP" />
+		<cxf:jaxws-service doc:name="flujoInvestigador"
+			service="investigadorService" serviceClass="co.com.ic2.colciencias.ws.IServiceInvestigador" />
+		<choice doc:name="Choice">
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarInvestigadores'">
+				<processor-chain doc:name="Processor Chain">
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select * from investigador]]></db:parameterized-query>
+					</db:select>
+				</processor-chain>
+			</when>
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarInvestigador'">
+				<processor-chain doc:name="Processor Chain">
+					<set-session-variable variableName="codigo"
+						value="#[payload[0]]" doc:name="Session Variable" />
+					<set-session-variable variableName="nombre"
+						value="#[payload[1]]" doc:name="Session Variable" />
+					<set-session-variable variableName="categoria"
+						value="#[payload[2]]" doc:name="Session Variable" />
+					<db:insert config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[insert into investigador (k_codigo,n_nombre,c_categoria) values(#[codigo],#[nombre],#[categoria])]]></db:parameterized-query>
+					</db:insert>
+				</processor-chain>
+			</when>
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarInvestigadores'">
+				<processor-chain doc:name="Processor Chain">
+					<set-session-variable variableName="codigoGrupo"
+						value="#[payload[0]]" doc:name="Session Variable" />
+					<set-session-variable variableName="investigadores"
+						value="#[payload[1]]" doc:name="Session Variable" />
+
+					<foreach collection="investigadores" doc:name="For Each"
+						counterVariableName="i" rootMessageVariableName="investigador">
+
+						<set-variable variableName="investigador" value="#[investigadores[i-1]]"
+							doc:name="Session Variable" />
+
+						<db:select config-ref="MySQL_Configuration" doc:name="Database">
+							<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[investigador.nombreCompleto]]]></db:parameterized-query>
+						</db:select>
+
+						<choice doc:name="Choice">
+							<when expression="#[payload.size() ==0]">
+								<logger message="no existe investigador" level="INFO"
+									doc:name="Logger" />
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into investigador (n_nombre,c_categoria) values(#[investigador.nombreCompleto],#[investigador.categoria])]]></db:parameterized-query>
+								</db:insert>
+
+								<set-variable variableName="idInvestigador"
+									value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							</when>
+							<otherwise>
+								<logger message="Investigador #[payload] ya existe"
+									level="INFO" doc:name="Logger" />
+
+								<set-variable variableName="idInvestigador" value="#[payload[0].k_codigo]"
+									doc:name="Variable" />
+							</otherwise>
+						</choice>
+
+						<logger message="#[idInvestigador]" level="INFO" doc:name="Logger" />
+
+						<db:insert config-ref="MySQL_Configuration"
+							autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+							doc:name="Database">
+							<db:parameterized-query><![CDATA[insert into integrante_grupo (i_cod_grupo_investigacion,i_cod_investigador,b_lider_grupo,f_inicio_vinculacion,f_fin_vinculacion) values(#[codigoGrupo],#[idInvestigador],#[investigador.lider],#[investigador.inicioVinculacion],#[investigador.finVinculacion])]]></db:parameterized-query>
+						</db:insert>
+
+					</foreach>
+
+				</processor-chain>
+			</when>
+		</choice>
+		<mulexml:object-to-xml-transformer
+			doc:name="Object to XML" />
+	</flow>
+
 </mule>
