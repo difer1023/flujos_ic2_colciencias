@@ -16,6 +16,7 @@ public class GeneracionContenidoImpreso extends ProductoInvestigacion{
     private String lugarPublicacion;
     private String fecha;
     private String medioCirculacion;
+    private String ambito;
     private ArrayList<Investigador> autores;
     private String tipo;
     
@@ -31,6 +32,8 @@ public class GeneracionContenidoImpreso extends ProductoInvestigacion{
     private String mes;
     private String issn;
     private int ano;
+    
+    private boolean certificacion;
 
     public String getLugarPublicacion() {
         return lugarPublicacion;
@@ -167,6 +170,20 @@ public class GeneracionContenidoImpreso extends ProductoInvestigacion{
     public void setAno(int ano) {
         this.ano = ano;
     }
-    
-    
+
+	public String getAmbito() {
+		return ambito;
+	}
+
+	public void setAmbito(String ambito) {
+		this.ambito = ambito;
+	}
+
+	public boolean isCertificacion() {
+		return certificacion;
+	}
+
+	public void setCertificacion(boolean certificacion) {
+		this.certificacion = certificacion;
+	}   
 }

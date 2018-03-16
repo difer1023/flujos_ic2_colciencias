@@ -18,6 +18,10 @@ public class EstrategiaComunicacionConocimiento extends ProductoInvestigacion{
     private int anoInicio;
     private String descripcion;
     private String tipo;
+    
+    private String lider;
+    private String nombreComunidad;
+    private boolean certificacion;
 
     public int getAnoInicio() {
         return anoInicio;
@@ -42,6 +46,28 @@ public class EstrategiaComunicacionConocimiento extends ProductoInvestigacion{
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
-    
-    
+
+	public String getLider() {
+		return lider;
+	}
+
+	public void setLider(String lider) {
+		this.lider = lider;
+	}
+
+	public String getNombreComunidad() {
+		return nombreComunidad;
+	}
+
+	public void setNombreComunidad(String nombreComunidad) {
+		this.nombreComunidad = nombreComunidad;
+	}
+
+	public boolean isCertificacion() {
+		return certificacion;
+	}
+
+	public void setCertificacion(boolean certificacion) {
+		this.certificacion = certificacion;
+	}
 }

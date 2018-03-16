@@ -21,6 +21,8 @@ public class PlantaPiloto extends ProductoInvestigacion{
     private String institucion;
     private ArrayList<Investigador> autores;
     private String tipo;
+    
+    private boolean copiaContrato;
 
     public String getPais() {
         return pais;
@@ -77,7 +79,14 @@ public class PlantaPiloto extends ProductoInvestigacion{
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
-    
+
+	public boolean isCopiaContrato() {
+		return copiaContrato;
+	}
+
+	public void setCopiaContrato(boolean copiaContrato) {
+		this.copiaContrato = copiaContrato;
+	}   
 }
 
 

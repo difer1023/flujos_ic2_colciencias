@@ -9,10 +9,10 @@ import co.com.ic2.colciencias.gruplac.Investigador;
 import java.util.ArrayList;
 
 /**
- * Clase que representa el producto Innovación en Proceso
+ * Clase que representa el producto Prototipo Industrial
  * @author L
  */
-public class InnovacionProceso extends ProductoInvestigacion{
+public class PrototipoIndustrial extends ProductoInvestigacion{
     
     private String pais;
     private int ano;
@@ -20,6 +20,8 @@ public class InnovacionProceso extends ProductoInvestigacion{
     private String institucion;
     private ArrayList<Investigador> autores;
     private String tipo;
+    
+    private boolean copiaContrato;
 
     public String getPais() {
         return pais;
@@ -68,7 +70,14 @@ public class InnovacionProceso extends ProductoInvestigacion{
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
-    
+
+	public boolean isCopiaContrato() {
+		return copiaContrato;
+	}
+
+	public void setCopiaContrato(boolean copiaContrato) {
+		this.copiaContrato = copiaContrato;
+	}
 }
 
 

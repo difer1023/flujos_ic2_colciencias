@@ -21,6 +21,11 @@ public class GeneracionContenidoVirtual extends ProductoInvestigacion{
     private ArrayList<Investigador> autores;
     private ArrayList<Institucion> instituciones;
     private String tipo;
+    
+    private String comunidad;
+    private String resumen;
+    private String url;
+    private boolean certificacion;
 
     public int getAno() {
         return ano;
@@ -69,6 +74,36 @@ public class GeneracionContenidoVirtual extends ProductoInvestigacion{
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
-    
-    
+
+	public String getComunidad() {
+		return comunidad;
+	}
+
+	public void setComunidad(String comunidad) {
+		this.comunidad = comunidad;
+	}
+
+	public String getResumen() {
+		return resumen;
+	}
+
+	public void setResumen(String resumen) {
+		this.resumen = resumen;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public boolean isCertificacion() {
+		return certificacion;
+	}
+
+	public void setCertificacion(boolean certificacion) {
+		this.certificacion = certificacion;
+	}   
 }

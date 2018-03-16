@@ -9,10 +9,10 @@ import co.com.ic2.colciencias.gruplac.Investigador;
 import java.util.ArrayList;
 
 /**
- * Clase que representa el producto Informa final de investigación
+ * Clase que representa el producto Informe final de investigación
  * @author L
  */
-public class InformeInvestigacion extends ProductoInvestigacion{
+public class InformeFinalInvestigacion extends ProductoInvestigacion{
     private int ano;
     private String proyecto;
     private ArrayList<Investigador> autores;

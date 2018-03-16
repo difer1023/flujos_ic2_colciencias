@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * Clase que representa el producto Trabajo dirigido
  * @author L
  */
-public class TrabajoDirigido extends ProductoInvestigacion{
+public class TrabajoGrado extends ProductoInvestigacion{
     
     private String tipo;
     private String lugar;

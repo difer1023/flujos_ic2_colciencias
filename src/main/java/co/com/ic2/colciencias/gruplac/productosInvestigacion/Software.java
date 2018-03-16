@@ -24,6 +24,11 @@ public class Software extends ProductoInvestigacion{
     private ArrayList<Investigador> autores;
     private String tipo;
     private String registrosAsociados;
+    
+    private String registroDerechosAutor;
+    private String descripcion;
+    private String codigoProyectoColciencias;
+    private boolean certificacion;
 
     public String getPais() {
         return pais;
@@ -105,5 +110,36 @@ public class Software extends ProductoInvestigacion{
         this.registrosAsociados = registrosAsociados;
     }
 
+	public String getRegistroDerechosAutor() {
+		return registroDerechosAutor;
+	}
+
+	public void setRegistroDerechosAutor(String registroDerechosAutor) {
+		this.registroDerechosAutor = registroDerechosAutor;
+	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+
+	public String getCodigoProyectoColciencias() {
+		return codigoProyectoColciencias;
+	}
+
+	public void setCodigoProyectoColciencias(String codigoProyectoColciencias) {
+		this.codigoProyectoColciencias = codigoProyectoColciencias;
+	}
+
+	public boolean isCertificacion() {
+		return certificacion;
+	}
+
+	public void setCertificacion(boolean certificacion) {
+		this.certificacion = certificacion;
+	}
 }
 

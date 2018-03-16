@@ -23,7 +23,7 @@ public class TransformerApoyoProgramaFormacion {
 				ApoyoProgramaFormacion apoyoProgramaFormacion=new ApoyoProgramaFormacion();
 				apoyoProgramaFormacion.setCodigo(object.get("k_codigo").getAsInt());
 				apoyoProgramaFormacion.setNombre(object.get("n_nombre").getAsString());
-				apoyoProgramaFormacion.setInstitucion(object.get("n_institucion").getAsString());
+				apoyoProgramaFormacion.setInstitucion(object.get("i_institucion").getAsString());
 				apoyoProgramaFormacion.setFacultad(object.get("n_facultad").getAsString());
 				apoyoProgramaFormacion.setDepartamento(object.get("n_departamento").getAsString());
 				apoyoProgramaFormacion.setNumActoAdmin(object.get("n_num_acto_admin").getAsString());

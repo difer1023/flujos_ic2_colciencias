@@ -20,6 +20,11 @@ public class GeneracionContenidoMultimedia extends ProductoInvestigacion{
     private ArrayList<Investigador> autores;
     private ArrayList<Institucion> instituciones;
     private String tipo;
+    
+    private String ambito;
+    private String comunidades;
+    private String resumen;
+    private boolean certificacion;
 
     public int getAno() {
         return ano;
@@ -60,4 +65,36 @@ public class GeneracionContenidoMultimedia extends ProductoInvestigacion{
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
+
+	public String getAmbito() {
+		return ambito;
+	}
+
+	public void setAmbito(String ambito) {
+		this.ambito = ambito;
+	}
+
+	public String getComunidades() {
+		return comunidades;
+	}
+
+	public void setComunidades(String comunidades) {
+		this.comunidades = comunidades;
+	}
+
+	public String getResumen() {
+		return resumen;
+	}
+
+	public void setResumen(String resumen) {
+		this.resumen = resumen;
+	}
+
+	public boolean isCertificacion() {
+		return certificacion;
+	}
+
+	public void setCertificacion(boolean certificacion) {
+		this.certificacion = certificacion;
+	}
 }

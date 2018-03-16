@@ -25,7 +25,7 @@ public class TransformerEspacioParticipacionCiudadanaCTI {
 				espacioParticipacionCiudadana.setNombre(object.get("n_nombre_espacio").getAsString());
 				espacioParticipacionCiudadana.setAnoInicio(object.get("f_fecha_inicio").getAsInt());
 				espacioParticipacionCiudadana.setNombreComunidad(object.get("n_nombre_comunidad").getAsString());
-				espacioParticipacionCiudadana.setConstanciaParticipacion(object.get("n_constancia_participacion").getAsBoolean());
+				espacioParticipacionCiudadana.setConstanciaParticipacion(object.get("b_constancia_participacion").getAsBoolean());
 				espacioParticipacionCiudadana.setCategoria(object.get("c_categoria").getAsString());
 				espacioParticipacionCiudadana.setClasificado(object.get("b_clasificado").getAsBoolean());
 				espaciosParticipacionCiudadana.add(espacioParticipacionCiudadana);

@@ -22,7 +22,7 @@ public class TransformerCapituloLibroInvestigacion {
 				JsonObject object=parser.parse(objectArray.get(i).toString()).getAsJsonObject();
 				CapituloLibroPublicado capituloLibroPublicado=new CapituloLibroPublicado();
 				capituloLibroPublicado.setCodigo(object.get("k_codigo").getAsInt());
-				capituloLibroPublicado.setNombre(object.get("c_ISBN_libro").getAsString());
+				capituloLibroPublicado.setIsbn(object.get("c_ISBN_libro").getAsString());
 				capituloLibroPublicado.setTituloLibro(object.get("n_titulo").getAsString());
 				capituloLibroPublicado.setTituloCapitulo(object.get("n_titulo_cap").getAsString());
 				capituloLibroPublicado.setAno(object.get("f_fecha_publicacion").getAsInt());

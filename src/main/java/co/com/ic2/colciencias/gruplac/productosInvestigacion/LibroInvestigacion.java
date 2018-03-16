@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * Clase que representa el producto Libro
  * @author L
  */
-public class LibroPublicado extends ProductoInvestigacion{
+public class LibroInvestigacion extends ProductoInvestigacion{
     private String isbn;
     private int ano;
     private String pais;
@@ -21,7 +21,7 @@ public class LibroPublicado extends ProductoInvestigacion{
     private String tipo;
     private String mes;
     private int numeroAutores;
-    private String requisitosVerificacion;
+    private boolean requisitosGuiaVerificacion;
     
     private String certificacionInstitucion;
     private String bookCitationIndex;
@@ -94,12 +94,12 @@ public class LibroPublicado extends ProductoInvestigacion{
         this.numeroAutores = numeroAutores;
     }
 
-    public String getRequisitosVerificacion() {
-        return requisitosVerificacion;
+    public boolean getRequisitosVerificacion() {
+        return requisitosGuiaVerificacion;
     }
 
-    public void setRequisitosVerificacion(String requisitosVerificacion) {
-        this.requisitosVerificacion = requisitosVerificacion;
+    public void setRequisitosGuiaVerificacion(boolean requisitosGuiaVerificacion) {
+        this.requisitosGuiaVerificacion = requisitosGuiaVerificacion;
     }
 
     public String getCertificacionInstitucion() {

@@ -9,10 +9,10 @@ import co.com.ic2.colciencias.gruplac.Investigador;
 import java.util.ArrayList;
 
 /**
- * Clase que representa el producto Prototipo
+ * Clase que representa el producto Innovación en Proceso
  * @author L
  */
-public class Prototipo extends ProductoInvestigacion{
+public class InnovacionProcedimientoServicio extends ProductoInvestigacion{
     
     private String pais;
     private int ano;
@@ -20,6 +20,11 @@ public class Prototipo extends ProductoInvestigacion{
     private String institucion;
     private ArrayList<Investigador> autores;
     private String tipo;
+    
+    private String nit;
+    private boolean certificadoImpPeq;
+    private boolean certificadoImpMed;
+    private boolean certificadoImpGran;
 
     public String getPais() {
         return pais;
@@ -68,7 +73,38 @@ public class Prototipo extends ProductoInvestigacion{
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
-    
+
+	public String getNit() {
+		return nit;
+	}
+
+	public void setNit(String nit) {
+		this.nit = nit;
+	}
+
+	public boolean isCertificadoImpPeq() {
+		return certificadoImpPeq;
+	}
+
+	public void setCertificadoImpPeq(boolean certificadoImpPeq) {
+		this.certificadoImpPeq = certificadoImpPeq;
+	}
+
+	public boolean isCertificadoImpMed() {
+		return certificadoImpMed;
+	}
+
+	public void setCertificadoImpMed(boolean certificadoImpMed) {
+		this.certificadoImpMed = certificadoImpMed;
+	}
+
+	public boolean isCertificadoImpGran() {
+		return certificadoImpGran;
+	}
+
+	public void setCertificadoImpGran(boolean certificadoImpGran) {
+		this.certificadoImpGran = certificadoImpGran;
+	}
 }
 
 
