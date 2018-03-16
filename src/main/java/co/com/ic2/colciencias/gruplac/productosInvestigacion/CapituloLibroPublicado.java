@@ -23,6 +23,7 @@ public class CapituloLibroPublicado extends ProductoInvestigacion {
     
     private int numeroAutores;
     private boolean requisitosGuiaVerificacion;
+    private boolean certificadoValidacion;
     
     private String tituloCapitulo;
 
@@ -105,4 +106,13 @@ public class CapituloLibroPublicado extends ProductoInvestigacion {
 	public void setTituloCapitulo(String tituloCapitulo) {
 		this.tituloCapitulo = tituloCapitulo;
 	}
+
+	public boolean isCertificadoValidacion() {
+		return certificadoValidacion;
+	}
+
+	public void setCertificadoValidacion(boolean certificadoValidacion) {
+		this.certificadoValidacion = certificadoValidacion;
+	}
+	
 }

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.9.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
@@ -14,35 +13,192 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-<flow name="flujo-capitulo-libro-investigacion">
-        <http:listener config-ref="HTTP_colciencias_Configuration" path="/flujoCapituloLibroInvestigacion" doc:name="HTTP"/>
-        <cxf:jaxws-service  doc:name="flujoCapituloLibroInvestigacion"  service="capituloLibroInvestigacionService" serviceClass="co.com.ic2.colciencias.ws.IServiceCapituloLibroInvestigacion"/>
-        <choice doc:name="Choice">
-            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarCapitulosLibrosInvestigacion'">
-	                <processor-chain doc:name="Processor Chain">
-	                    <db:select config-ref="MySQL_Configuration" doc:name="Database">
-	                        <db:parameterized-query><![CDATA[select * cap_libro_investigacion]]></db:parameterized-query>
-	                    </db:select>
-	                </processor-chain>
-            </when>
-            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarCapituloLibroInvestigacion'">
-	                <processor-chain doc:name="Processor Chain">
-	                <set-session-variable variableName="codigo" value="#[payload[0]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="isbnLibro" value="#[payload[1]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="tituloCapitulo" value="#[payload[1]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="fechaPublicacion" value="#[payload[2]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="validacionInvestigacion" value="#[payload[3]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="categoria" value="#[payload[4]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="clasificado" value="#[payload[5]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="certificadoValidacion" value="#[payload[6]]" doc:name="Session Variable"/>
-	                    <db:insert config-ref="MySQL_Configuration" doc:name="Database">
-	                        <db:parameterized-query><![CDATA[insert into cap_libro_investigacion (k_codigo,c_ISBN_libro,n_titulo_cap,f_fecha_publicacion,
+	<flow name="flujo-capitulo-libro-investigacion">
+		<http:listener config-ref="HTTP_colciencias_Configuration"
+			path="/flujoCapituloLibroInvestigacion" doc:name="HTTP" />
+		<cxf:jaxws-service doc:name="flujoCapituloLibroInvestigacion"
+			service="capituloLibroInvestigacionService"
+			serviceClass="co.com.ic2.colciencias.ws.IServiceCapituloLibroInvestigacion" />
+		<choice doc:name="Choice">
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarCapitulosLibrosInvestigacion'">
+				<processor-chain doc:name="Processor Chain">
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select * cap_libro_investigacion]]></db:parameterized-query>
+					</db:select>
+				</processor-chain>
+			</when>
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarCapituloLibroInvestigacion'">
+				<processor-chain doc:name="Processor Chain">
+					<set-session-variable variableName="codigo"
+						value="#[payload[0]]" doc:name="Session Variable" />
+					<set-session-variable variableName="isbnLibro"
+						value="#[payload[1]]" doc:name="Session Variable" />
+					<set-session-variable variableName="tituloCapitulo"
+						value="#[payload[1]]" doc:name="Session Variable" />
+					<set-session-variable variableName="fechaPublicacion"
+						value="#[payload[2]]" doc:name="Session Variable" />
+					<set-session-variable variableName="validacionInvestigacion"
+						value="#[payload[3]]" doc:name="Session Variable" />
+					<set-session-variable variableName="categoria"
+						value="#[payload[4]]" doc:name="Session Variable" />
+					<set-session-variable variableName="clasificado"
+						value="#[payload[5]]" doc:name="Session Variable" />
+					<set-session-variable variableName="certificadoValidacion"
+						value="#[payload[6]]" doc:name="Session Variable" />
+					<db:insert config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[insert into cap_libro_investigacion (k_codigo,c_ISBN_libro,n_titulo_cap,f_fecha_publicacion,
 	                        b_validacion_inv_an5,c_categoria,b_clasificado,b_certificado_validacion) values(#[codigo],#[isbnLibro],#[fechaPublicacion],#[validacionInvestigacion],
 	                        #[categoria],#[clasificado],#[certificadoValidacion])]]></db:parameterized-query>
-	                    </db:insert>
-	                </processor-chain>
-            </when>
-        </choice>
-        <mulexml:object-to-xml-transformer doc:name="Object to XML"/>
-    </flow>
+					</db:insert>
+				</processor-chain>
+			</when>
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarCapitulosLibroInvestigacion'">
+				<processor-chain doc:name="Processor Chain">
+					<set-session-variable variableName="codigoGrupo"
+						value="#[payload[0]]" doc:name="Session Variable" />
+					<set-session-variable variableName="capitulosLibro"
+						value="#[payload[1]]" doc:name="Session Variable" />
+					<foreach collection="capitulosLibro" doc:name="For Each"
+						counterVariableName="i" rootMessageVariableName="capituloLibro">
+						<set-variable variableName="capituloLibro" value="#[capitulosLibro[i-1]]"
+							doc:name="Session Variable" />
+
+						<!-- Verificacion de Libro -->
+
+						<db:select config-ref="MySQL_Configuration" doc:name="Database">
+							<db:parameterized-query><![CDATA[select k_ISBN from libro where k_ISBN=#[capituloLibro.isbn] and n_titulo=#[capituloLibro.tituloLibro]]]></db:parameterized-query>
+						</db:select>
+						<logger message="#[payload]" level="INFO" doc:name="Logger" />
+
+						<choice doc:name="Choice">
+							<when expression="#[payload.size() ==0]">
+								<logger message="no existe isbn" level="INFO" doc:name="Logger" />
+
+								<!-- Verificacion de Editorial -->
+
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from editorial where n_nombre=#[capituloLibro.editorial]]]></db:parameterized-query>
+								</db:select>
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe editorial" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into editorial (n_nombre) values(#[capituloLibro.editorial])]]></db:parameterized-query>
+										</db:insert>
+
+										<set-variable variableName="idEditorial"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+
+									</when>
+									<otherwise>
+
+										<set-variable variableName="idEditorial"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+
+										<logger message="Editorial #[idEditorial] ya existe"
+											level="INFO" doc:name="Logger" />
+									</otherwise>
+								</choice>
+
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+
+
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into libro (k_ISBN,n_titulo,i_editorial,i_pais_publicacion) values(#[capituloLibro.isbn],#[capituloLibro.tituloLibro],#[idEditorial],(select k_codigo from pais where n_nombre like #[capituloLibro.pais.concat('%')]))]]></db:parameterized-query>
+								</db:insert>
+
+								
+
+							</when>
+							<otherwise>
+
+								
+
+								<logger message="ISBN #[capituloLibro.isbn] ya existe" level="INFO"
+									doc:name="Logger" />
+							</otherwise>
+						</choice>
+
+						<logger message="#[payload]" level="INFO" doc:name="Logger" />
+
+						<db:insert config-ref="MySQL_Configuration" 
+						autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+						doc:name="Database">
+							<db:parameterized-query><![CDATA[insert into cap_libro_investigacion (c_ISBN_libro,n_titulo_cap,f_fecha_publicacion,
+	                        b_validacion_inv_an5,c_categoria,b_clasificado,b_certificado_validacion) values(#[capituloLibro.isbn],#[capituloLibro.nombre],#[capituloLibro.fechaPublicacion],
+	                        #[capituloLibro.requisitosGuiaVerificacion],#[capituloLibro.categoria],#[capituloLibro.clasificado],#[capituloLibro.certificadoValidacion])]]></db:parameterized-query>
+						</db:insert>
+						<logger message="#[payload]" level="INFO" doc:name="Logger" />
+						<set-variable variableName="idCapLibro"
+									value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									
+						<set-variable variableName="autores"
+							value="#[capituloLibro.autores]" doc:name="Variable" />
+
+						<foreach collection="autores" doc:name="For Each"
+							counterVariableName="j" rootMessageVariableName="autor">
+							<set-variable variableName="autor" value="#[autores[j-1]]"
+								doc:name="Variable" />
+
+							<logger message="#[autor.nombreCompleto]" level="INFO"
+								doc:name="Logger" />
+
+							<db:select config-ref="MySQL_Configuration" doc:name="Database">
+								<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+							</db:select>
+
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+
+							<choice doc:name="Choice">
+								<when expression="#[payload.size() ==0]">
+									<logger message="no existe investigador" level="INFO"
+										doc:name="Logger" />
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+									</db:insert>
+
+									<set-variable variableName="idAutor"
+										value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+								</when>
+								<otherwise>
+									<logger message="Investigador #[payload] ya existe"
+										level="INFO" doc:name="Logger" />
+
+									<set-variable variableName="idAutor"
+										value="#[payload[0].k_codigo]" doc:name="Variable" />
+								</otherwise>
+							</choice>
+
+							<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+							
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into cap_libro_autor (i_cod_cap_libro,i_cod_integrante,i_cod_grupo_investigacion) values(#[idCapLibro],#[idAutor],#[codigoGrupo])]]></db:parameterized-query>
+							</db:insert>
+							
+						</foreach>
+
+
+					</foreach>
+
+
+				</processor-chain>
+			</when>
+		</choice>
+		<mulexml:object-to-xml-transformer
+			doc:name="Object to XML" />
+	</flow>
 </mule>
