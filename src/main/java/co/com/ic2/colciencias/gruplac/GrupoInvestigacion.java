@@ -14,7 +14,7 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.DisenoIndustrial;
 import co.com.ic2.colciencias.gruplac.productosInvestigacion.DocumentoTrabajo;
 import co.com.ic2.colciencias.gruplac.productosInvestigacion.Edicion;
 import co.com.ic2.colciencias.gruplac.productosInvestigacion.EmpresaBaseTecnologica;
-import co.com.ic2.colciencias.gruplac.productosInvestigacion.EspacioParticipacionCiudadana;
+import co.com.ic2.colciencias.gruplac.productosInvestigacion.EspacioParticipacionCiudadanaCTI;
 import co.com.ic2.colciencias.gruplac.productosInvestigacion.EsquemaCircuito;
 import co.com.ic2.colciencias.gruplac.productosInvestigacion.EstrategiaComunicacionConocimiento;
 import co.com.ic2.colciencias.gruplac.productosInvestigacion.EstrategiaPedagogicaFomentoCTI;
@@ -84,7 +84,7 @@ public class GrupoInvestigacion {
     private ArrayList<GeneracionContenidoVirtual> generacionContenidoVirtual;
     private ArrayList<EstrategiaComunicacionConocimiento> estrategiaComunicacionConocimiento;
     private ArrayList<EstrategiaPedagogicaFomentoCTI> estrategiaPedagogicaFomentoCTI;
-    private ArrayList<EspacioParticipacionCiudadana> espacioParticipacionCiudadana;
+    private ArrayList<EspacioParticipacionCiudadanaCTI> espacioParticipacionCiudadana;
     private ArrayList<ParticipacionCiudadanaProyectoCTI> participacionCiudadanaProyectoCTI;
     private ArrayList<AsesoriaProgramaOndas> asesoriaProgramaOndas;
     private ArrayList<TrabajoGrado> trabajoDirigido;
@@ -421,11 +421,11 @@ public class GrupoInvestigacion {
         this.estrategiaPedagogicaFomentoCTI = estrategiaPedagogicaFomentoCTI;
     }
 
-    public ArrayList<EspacioParticipacionCiudadana> getEspacioParticipacionCiudadana() {
+    public ArrayList<EspacioParticipacionCiudadanaCTI> getEspacioParticipacionCiudadana() {
         return espacioParticipacionCiudadana;
     }
 
-    public void setEspacioParticipacionCiudadana(ArrayList<EspacioParticipacionCiudadana> espacioParticipacionCiudadana) {
+    public void setEspacioParticipacionCiudadana(ArrayList<EspacioParticipacionCiudadanaCTI> espacioParticipacionCiudadana) {
         this.espacioParticipacionCiudadana = espacioParticipacionCiudadana;
     }
 

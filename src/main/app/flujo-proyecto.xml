@@ -1,52 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
 	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.9.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd 
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd 
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
 http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd 
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
 http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-<flow name="flujo-proyecto">
-        <http:listener config-ref="HTTP_colciencias_Configuration" path="/flujoProyecto" doc:name="HTTP"/>
-        <cxf:jaxws-service  doc:name="flujoProyecto"  service="proyectoService" serviceClass="co.com.ic2.colciencias.ws.IServiceProyecto"/>
-        <choice doc:name="Choice">
-            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarProyectos'">
-	                <processor-chain doc:name="Processor Chain">
-	                    <db:select config-ref="MySQL_Configuration" doc:name="Database">
-	                        <db:parameterized-query><![CDATA[select * from proyecto]]></db:parameterized-query>
-	                    </db:select>
-	                </processor-chain>
-            </when>
-            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarProyecto'">
-	                <processor-chain doc:name="Processor Chain">
-	                <set-session-variable variableName="codigo" value="#[payload[0]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="titulo" value="#[payload[1]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="institucion" value="#[payload[2]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="entidadFinanciadora" value="#[payload[3]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="financiacion" value="#[payload[4]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="actoAdmin" value="#[payload[5]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="ano" value="#[payload[6]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="numeroContrato" value="#[payload[7]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="tipoProyecto" value="#[payload[8]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="categoria" value="#[payload[9]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="clasificado" value="#[payload[10]]" doc:name="Session Variable"/> 
-	                    <db:insert config-ref="MySQL_Configuration" doc:name="Database">
-	                        <db:parameterized-query><![CDATA[insert into proyecto (k_codigo,n_titulo,n_institucion,n_entidad_financiadora,
+	<flow name="flujo-proyecto">
+		<http:listener config-ref="HTTP_colciencias_Configuration"
+			path="/flujoProyecto" doc:name="HTTP" />
+		<cxf:jaxws-service doc:name="flujoProyecto" service="proyectoService"
+			serviceClass="co.com.ic2.colciencias.ws.IServiceProyecto" />
+		<choice doc:name="Choice">
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarProyectos'">
+				<processor-chain doc:name="Processor Chain">
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select * from proyecto]]></db:parameterized-query>
+					</db:select>
+					<json:object-to-json-transformer
+						doc:name="Object to JSON" />
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+					<scripting:component doc:name="Groovy">
+						<scripting:script engine="Groovy"><![CDATA[co.com.ic2.transformers.TransformerProyecto.getProyectos(payload)]]></scripting:script>
+					</scripting:component>
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+				</processor-chain>
+			</when>
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarProyectosGrupo'">
+				<processor-chain doc:name="Processor Chain">
+
+					<set-session-variable variableName="codigoGrupo"
+						value="#[payload]" doc:name="Session Variable" />
+
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select * from proyecto p,proyecto_investigador pi where p.k_codigo=pi.i_cod_proyecto and pi.i_cod_grupo_investigacion=#[codigoGrupo]]]></db:parameterized-query>
+					</db:select>
+
+					<json:object-to-json-transformer
+						doc:name="Object to JSON" />
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+					<scripting:component doc:name="Groovy">
+						<scripting:script engine="Groovy"><![CDATA[co.com.ic2.transformers.TransformerProyecto.getProyectos(payload)]]></scripting:script>
+					</scripting:component>
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+				</processor-chain>
+			</when>
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarProyecto'">
+				<processor-chain doc:name="Processor Chain">
+					<set-session-variable variableName="codigo"
+						value="#[payload[0]]" doc:name="Session Variable" />
+					<set-session-variable variableName="titulo"
+						value="#[payload[1]]" doc:name="Session Variable" />
+					<set-session-variable variableName="institucion"
+						value="#[payload[2]]" doc:name="Session Variable" />
+					<set-session-variable variableName="entidadFinanciadora"
+						value="#[payload[3]]" doc:name="Session Variable" />
+					<set-session-variable variableName="financiacion"
+						value="#[payload[4]]" doc:name="Session Variable" />
+					<set-session-variable variableName="actoAdmin"
+						value="#[payload[5]]" doc:name="Session Variable" />
+					<set-session-variable variableName="ano"
+						value="#[payload[6]]" doc:name="Session Variable" />
+					<set-session-variable variableName="numeroContrato"
+						value="#[payload[7]]" doc:name="Session Variable" />
+					<set-session-variable variableName="tipoProyecto"
+						value="#[payload[8]]" doc:name="Session Variable" />
+					<set-session-variable variableName="categoria"
+						value="#[payload[9]]" doc:name="Session Variable" />
+					<set-session-variable variableName="clasificado"
+						value="#[payload[10]]" doc:name="Session Variable" />
+					<db:insert config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[insert into proyecto (k_codigo,n_titulo,n_institucion,n_entidad_financiadora,
 	                        n_financiacion,b_acto_admin,i_ano,n_numero_contrato,i_tipo_proyecto,c_categoria,b_clasificado) values(#[codigo],
 	                        #[titulo],#[institucion],#[entidadFinanciadora],#[financiacion],#[actoAdmin],#[ano],#[numeroContrato],#[tipoProyecto],
 	                        #[categoria],#[clasificado]])]]></db:parameterized-query>
-	                    </db:insert>
-	                </processor-chain>
-            </when>
-        </choice>
-        <mulexml:object-to-xml-transformer doc:name="Object to XML"/>
-    </flow>
+					</db:insert>
+				</processor-chain>
+			</when>
+		</choice>
+	</flow>
 </mule>

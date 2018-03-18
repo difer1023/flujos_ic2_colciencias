@@ -36,8 +36,6 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	                </processor-chain>
             </when>
         </choice>
-        <mulexml:object-to-xml-transformer doc:name="Object to XML"/>
     </flow>
-
 </mule>
 

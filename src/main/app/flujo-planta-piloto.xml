@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
 	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
@@ -8,6 +10,8 @@
 	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.9.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd 
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd 
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
 http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd 
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
@@ -23,8 +27,35 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	                    <db:select config-ref="MySQL_Configuration" doc:name="Database">
 	                        <db:parameterized-query><![CDATA[select * from planta_piloto]]></db:parameterized-query>
 	                    </db:select>
-	                </processor-chain>
-            </when>
+	                <json:object-to-json-transformer
+						doc:name="Object to JSON" />
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+					<scripting:component doc:name="Groovy">
+						<scripting:script engine="Groovy"><![CDATA[co.com.ic2.transformers.TransformerPlantaPiloto.getPlantasPiloto(payload)]]></scripting:script>
+					</scripting:component>
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+				</processor-chain>
+			</when>
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarPlantasPilotoGrupo'">
+				<processor-chain doc:name="Processor Chain">
+
+					<set-session-variable variableName="codigoGrupo"
+						value="#[payload]" doc:name="Session Variable" />
+
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select * from planta_piloto pp, planta_piloto_autor ppa where pp.k_codigo=ppa.i_cod_planta_piloto and ppa.i_cod_grupo_investigacion=#[codigoGrupo]]]></db:parameterized-query>
+					</db:select>
+
+					<json:object-to-json-transformer
+						doc:name="Object to JSON" />
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+					<scripting:component doc:name="Groovy">
+						<scripting:script engine="Groovy"><![CDATA[co.com.ic2.transformers.TransformerPlantaPiloto.getPlantasPiloto(payload)]]></scripting:script>
+					</scripting:component>
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+				</processor-chain>
+			</when>
             <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarPlantaPiloto'">
 	                <processor-chain doc:name="Processor Chain">
 	                <set-session-variable variableName="codigo" value="#[payload[0]]" doc:name="Session Variable"/>
@@ -43,6 +74,5 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	                </processor-chain>
             </when>
         </choice>
-        <mulexml:object-to-xml-transformer doc:name="Object to XML"/>
     </flow>
 </mule>

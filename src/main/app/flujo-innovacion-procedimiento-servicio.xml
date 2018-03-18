@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
 	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
@@ -8,6 +10,8 @@
 	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.9.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd 
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd 
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
 http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd 
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
@@ -18,14 +22,41 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <http:listener config-ref="HTTP_colciencias_Configuration" path="/flujoLibroInnovacionProcedimientoServicio" doc:name="HTTP"/>
         <cxf:jaxws-service  doc:name="flujoInnovacionProcedimientoServicio"  service="innovacionProcedimientoServicioService" serviceClass="co.com.ic2.colciencias.ws.IServiceInnovacionProcedimientoServicio"/>
         <choice doc:name="Choice">
-            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarLibrosInvestigacion'">
+            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarInnovacionesProcedimientosServicios'">
 	                <processor-chain doc:name="Processor Chain">
 	                    <db:select config-ref="MySQL_Configuration" doc:name="Database">
 	                        <db:parameterized-query><![CDATA[select * innovacion_ps]]></db:parameterized-query>
 	                    </db:select>
-	                </processor-chain>
-            </when>
-            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarLibroInvestigacion'">
+	               <json:object-to-json-transformer
+						doc:name="Object to JSON" />
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+					<scripting:component doc:name="Groovy">
+						<scripting:script engine="Groovy"><![CDATA[co.com.ic2.transformers.TransformerInnovacionProcedimientoServicio.getInnovacionesProcedimientosServicios(payload)]]></scripting:script>
+					</scripting:component>
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+				</processor-chain>
+			</when>
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarInnovacionesProcedimientosServiciosGrupo'">
+				<processor-chain doc:name="Processor Chain">
+
+					<set-session-variable variableName="codigoGrupo"
+						value="#[payload]" doc:name="Session Variable" />
+
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select * from innovacion_ps i,innovacion_ps_autor ia where i.k_codigo=ia.i_cod_innovacion_ps and ia.i_cod_grupo_investigacion=#[codigoGrupo]]]></db:parameterized-query>
+					</db:select>
+
+					<json:object-to-json-transformer
+						doc:name="Object to JSON" />
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+					<scripting:component doc:name="Groovy">
+						<scripting:script engine="Groovy"><![CDATA[co.com.ic2.transformers.TransformerInnovacionProcedimientoServicio.getInnovacionesProcedimientosServicios(payload)]]></scripting:script>
+					</scripting:component>
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+				</processor-chain>
+			</when>
+            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarInnovacionProcedimientoServicio'">
 	                <processor-chain doc:name="Processor Chain">
 	                <set-session-variable variableName="codigo" value="#[payload[0]]" doc:name="Session Variable"/>
 	                <set-session-variable variableName="nombre" value="#[payload[1]]" doc:name="Session Variable"/>
@@ -45,6 +76,5 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	                </processor-chain>
             </when>
         </choice>
-        <mulexml:object-to-xml-transformer doc:name="Object to XML"/>
     </flow>
 </mule>

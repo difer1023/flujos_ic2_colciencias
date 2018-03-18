@@ -14,13 +14,13 @@ public class TransformerSignoDistintivo {
 
 	public static List<SignoDistintivo> getSignosDistintivos(String jsonSignosDistintivos) {
 		try {
-			ArrayList<SignoDistintivo> signosDistintivos=new ArrayList<>();
-			JsonParser parser=new JsonParser();
-			JsonArray objectArray=parser.parse(jsonSignosDistintivos).getAsJsonArray();
-			System.out.println("OBJECT A "+objectArray.toString());
-			for (int i=0;i<objectArray.size();i++){
-				JsonObject object=parser.parse(objectArray.get(i).toString()).getAsJsonObject();
-				SignoDistintivo signoDistintivo=new SignoDistintivo();
+			ArrayList<SignoDistintivo> signosDistintivos = new ArrayList<>();
+			JsonParser parser = new JsonParser();
+			JsonArray objectArray = parser.parse(jsonSignosDistintivos).getAsJsonArray();
+			System.out.println("OBJECT A " + objectArray.toString());
+			for (int i = 0; i < objectArray.size(); i++) {
+				JsonObject object = parser.parse(objectArray.get(i).toString()).getAsJsonObject();
+				SignoDistintivo signoDistintivo = new SignoDistintivo();
 				signoDistintivo.setCodigo(object.get("k_codigo").getAsInt());
 				signoDistintivo.setNumRegistro(object.get("c_numero_reg").getAsString());
 				signoDistintivo.setNombre(object.get("n_titulo").getAsString());
@@ -32,7 +32,7 @@ public class TransformerSignoDistintivo {
 				signoDistintivo.setCategoria(object.get("c_categoria").getAsString());
 				signoDistintivo.setClasificado(object.get("b_clasificado").getAsBoolean());
 				signosDistintivos.add(signoDistintivo);
-				System.out.println("OBJECT "+object.toString());
+				System.out.println("OBJECT " + object.toString());
 			}
 			return signosDistintivos;
 		} catch (JsonSyntaxException | NullPointerException e) {

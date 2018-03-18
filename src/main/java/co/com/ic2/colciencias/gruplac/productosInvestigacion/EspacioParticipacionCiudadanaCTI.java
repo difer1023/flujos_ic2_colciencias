@@ -9,7 +9,7 @@ package co.com.ic2.colciencias.gruplac.productosInvestigacion;
  * Clase que representa el producto Espacio de participación ciudadana
  * @author L
  */
-public class EspacioParticipacionCiudadana extends ProductoInvestigacion{
+public class EspacioParticipacionCiudadanaCTI extends ProductoInvestigacion{
     
     private int anoInicio;
     private String tipo;

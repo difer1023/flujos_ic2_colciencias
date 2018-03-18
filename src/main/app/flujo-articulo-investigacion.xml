@@ -2,10 +2,9 @@
 
 <mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
 	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
-	xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd 
@@ -28,34 +27,34 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 					<db:select config-ref="MySQL_Configuration" doc:name="Database">
 						<db:parameterized-query><![CDATA[select * from articulo]]></db:parameterized-query>
 					</db:select>
-					
+
 					<json:object-to-json-transformer
-					doc:name="Object to JSON" />
-				<logger message="#[payload]" level="INFO" doc:name="Logger" />
-				<scripting:component doc:name="Groovy">
-					<scripting:script engine="Groovy"><![CDATA[co.com.ic2.transformers.TransformerArticuloInvestigacion.getArticulosInvestigacion(payload)]]></scripting:script>
-				</scripting:component>
-				<logger message="#[payload]" level="INFO" doc:name="Logger" />
+						doc:name="Object to JSON" />
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+					<scripting:component doc:name="Groovy">
+						<scripting:script engine="Groovy"><![CDATA[co.com.ic2.transformers.TransformerArticuloInvestigacion.getArticulosInvestigacion(payload)]]></scripting:script>
+					</scripting:component>
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
 				</processor-chain>
 			</when>
 			<when evaluator="groovy"
 				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarArticulosInvestigacionGrupo'">
 				<processor-chain doc:name="Processor Chain">
-				
+
 					<set-session-variable variableName="codigoGrupo"
 						value="#[payload]" doc:name="Session Variable" />
-				
+
 					<db:select config-ref="MySQL_Configuration" doc:name="Database">
 						<db:parameterized-query><![CDATA[select * from articulo a,articulo_autor au where a.k_codigo=au.i_cod_articulo and au.i_cod_grupo_investigacion=#[codigoGrupo]]]></db:parameterized-query>
 					</db:select>
-					
+
 					<json:object-to-json-transformer
-					doc:name="Object to JSON" />
-				<logger message="#[payload]" level="INFO" doc:name="Logger" />
-				<scripting:component doc:name="Groovy">
-					<scripting:script engine="Groovy"><![CDATA[co.com.ic2.transformers.TransformerArticuloInvestigacion.getArticulosInvestigacion(payload)]]></scripting:script>
-				</scripting:component>
-				<logger message="#[payload]" level="INFO" doc:name="Logger" />
+						doc:name="Object to JSON" />
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+					<scripting:component doc:name="Groovy">
+						<scripting:script engine="Groovy"><![CDATA[co.com.ic2.transformers.TransformerArticuloInvestigacion.getArticulosInvestigacion(payload)]]></scripting:script>
+					</scripting:component>
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
 				</processor-chain>
 			</when>
 			<when evaluator="groovy"
@@ -194,6 +193,6 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 				</processor-chain>
 			</when>
 		</choice>
-		
+
 	</flow>
 </mule>

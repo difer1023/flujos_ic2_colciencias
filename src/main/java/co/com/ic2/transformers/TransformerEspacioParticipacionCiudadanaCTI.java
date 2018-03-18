@@ -8,19 +8,19 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
-import co.com.ic2.colciencias.gruplac.productosInvestigacion.EspacioParticipacionCiudadana;
+import co.com.ic2.colciencias.gruplac.productosInvestigacion.EspacioParticipacionCiudadanaCTI;
 
 public class TransformerEspacioParticipacionCiudadanaCTI {
 
-	public static List<EspacioParticipacionCiudadana> getEspaciosParticipacionCiudadana(String jsonEspaciosParticipacionCiudadana) {
+	public static List<EspacioParticipacionCiudadanaCTI> getEspaciosParticipacionCiudadana(String jsonEspaciosParticipacionCiudadana) {
 		try {
-			ArrayList<EspacioParticipacionCiudadana> espaciosParticipacionCiudadana=new ArrayList<>();
+			ArrayList<EspacioParticipacionCiudadanaCTI> espaciosParticipacionCiudadana=new ArrayList<>();
 			JsonParser parser=new JsonParser();
 			JsonArray objectArray=parser.parse(jsonEspaciosParticipacionCiudadana).getAsJsonArray();
 			System.out.println("OBJECT A "+objectArray.toString());
 			for (int i=0;i<objectArray.size();i++){
 				JsonObject object=parser.parse(objectArray.get(i).toString()).getAsJsonObject();
-				EspacioParticipacionCiudadana espacioParticipacionCiudadana=new EspacioParticipacionCiudadana();
+				EspacioParticipacionCiudadanaCTI espacioParticipacionCiudadana=new EspacioParticipacionCiudadanaCTI();
 				espacioParticipacionCiudadana.setCodigo(object.get("k_codigo").getAsInt());
 				espacioParticipacionCiudadana.setNombre(object.get("n_nombre_espacio").getAsString());
 				espacioParticipacionCiudadana.setAnoInicio(object.get("f_fecha_inicio").getAsInt());

@@ -14,13 +14,13 @@ public class TransformerPlantaPiloto {
 
 	public static List<PlantaPiloto> getPlantasPiloto(String jsonPlantasPiloto) {
 		try {
-			ArrayList<PlantaPiloto> plantasPiloto=new ArrayList<>();
-			JsonParser parser=new JsonParser();
-			JsonArray objectArray=parser.parse(jsonPlantasPiloto).getAsJsonArray();
-			System.out.println("OBJECT A "+objectArray.toString());
-			for (int i=0;i<objectArray.size();i++){
-				JsonObject object=parser.parse(objectArray.get(i).toString()).getAsJsonObject();
-				PlantaPiloto plantaPiloto=new PlantaPiloto();
+			ArrayList<PlantaPiloto> plantasPiloto = new ArrayList<>();
+			JsonParser parser = new JsonParser();
+			JsonArray objectArray = parser.parse(jsonPlantasPiloto).getAsJsonArray();
+			System.out.println("OBJECT A " + objectArray.toString());
+			for (int i = 0; i < objectArray.size(); i++) {
+				JsonObject object = parser.parse(objectArray.get(i).toString()).getAsJsonObject();
+				PlantaPiloto plantaPiloto = new PlantaPiloto();
 				plantaPiloto.setCodigo(object.get("k_codigo").getAsInt());
 				plantaPiloto.setNombre(object.get("n_nombre").getAsString());
 				plantaPiloto.setAno(object.get("f_fecha").getAsInt());
@@ -30,7 +30,7 @@ public class TransformerPlantaPiloto {
 				plantaPiloto.setCategoria(object.get("c_categoria").getAsString());
 				plantaPiloto.setClasificado(object.get("b_clasificado").getAsBoolean());
 				plantasPiloto.add(plantaPiloto);
-				System.out.println("OBJECT "+object.toString());
+				System.out.println("OBJECT " + object.toString());
 			}
 			return plantasPiloto;
 		} catch (JsonSyntaxException | NullPointerException e) {

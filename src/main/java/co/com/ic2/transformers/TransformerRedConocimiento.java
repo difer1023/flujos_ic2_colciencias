@@ -14,13 +14,13 @@ public class TransformerRedConocimiento {
 
 	public static List<RedConocimiento> getRedesConocimiento(String jsonRedesConocimiento) {
 		try {
-			ArrayList<RedConocimiento> redesConocimiento=new ArrayList<>();
-			JsonParser parser=new JsonParser();
-			JsonArray objectArray=parser.parse(jsonRedesConocimiento).getAsJsonArray();
-			System.out.println("OBJECT A "+objectArray.toString());
-			for (int i=0;i<objectArray.size();i++){
-				JsonObject object=parser.parse(objectArray.get(i).toString()).getAsJsonObject();
-				RedConocimiento redConocimiento=new RedConocimiento();
+			ArrayList<RedConocimiento> redesConocimiento = new ArrayList<>();
+			JsonParser parser = new JsonParser();
+			JsonArray objectArray = parser.parse(jsonRedesConocimiento).getAsJsonArray();
+			System.out.println("OBJECT A " + objectArray.toString());
+			for (int i = 0; i < objectArray.size(); i++) {
+				JsonObject object = parser.parse(objectArray.get(i).toString()).getAsJsonObject();
+				RedConocimiento redConocimiento = new RedConocimiento();
 				redConocimiento.setCodigo(object.get("k_codigo").getAsInt());
 				redConocimiento.setNombre(object.get("n_nombre").getAsString());
 				redConocimiento.setLugar(object.get("i_pais").getAsString());
@@ -32,7 +32,7 @@ public class TransformerRedConocimiento {
 				redConocimiento.setCategoria(object.get("c_categoria").getAsString());
 				redConocimiento.setClasificado(object.get("b_clasificado").getAsBoolean());
 				redesConocimiento.add(redConocimiento);
-				System.out.println("OBJECT "+object.toString());
+				System.out.println("OBJECT " + object.toString());
 			}
 			return redesConocimiento;
 		} catch (JsonSyntaxException | NullPointerException e) {
