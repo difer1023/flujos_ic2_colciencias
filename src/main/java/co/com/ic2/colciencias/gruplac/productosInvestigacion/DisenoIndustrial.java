@@ -22,7 +22,7 @@ public class DisenoIndustrial extends ProductoInvestigacion{
     private String tipo;
     
     private String numeroRegistro;
-    private String gaceta;
+    private boolean gaceta;
     private boolean contrato;
 
     public String getPais() {
@@ -81,11 +81,11 @@ public class DisenoIndustrial extends ProductoInvestigacion{
 		this.numeroRegistro = numeroRegistro;
 	}
 
-	public String getGaceta() {
+	public boolean getGaceta() {
 		return gaceta;
 	}
 
-	public void setGaceta(String gaceta) {
+	public void setGaceta(boolean gaceta) {
 		this.gaceta = gaceta;
 	}
 

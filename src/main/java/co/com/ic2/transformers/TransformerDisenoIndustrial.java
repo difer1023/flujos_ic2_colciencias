@@ -25,7 +25,7 @@ public class TransformerDisenoIndustrial {
 				disenoIndustrial.setNumeroRegistro(object.get("c_numero_reg").getAsString());
 				disenoIndustrial.setNombre(object.get("c_titulo_reg").getAsString());
 				disenoIndustrial.setAno(object.get("i_ano_obtencion").getAsInt());
-				disenoIndustrial.setGaceta(object.get("b_gaceta").getAsString());
+				disenoIndustrial.setGaceta(object.get("b_gaceta").getAsBoolean());
 				disenoIndustrial.setPais(object.get("i_pais_obtencion").getAsString());
 				disenoIndustrial.setContrato(object.get("b_contrato").getAsBoolean());
 				disenoIndustrial.setCategoria(object.get("c_categoria").getAsString());

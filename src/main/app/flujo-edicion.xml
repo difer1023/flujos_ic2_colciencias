@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.9.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
@@ -14,38 +13,117 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-<flow name="flujo-edicion">
-        <http:listener config-ref="HTTP_colciencias_Configuration" path="/flujoEdicion" doc:name="HTTP"/>
-        <cxf:jaxws-service  doc:name="flujoEdicion"  service="edicionService" serviceClass="co.com.ic2.colciencias.ws.IServiceEdicion"/>
-        <choice doc:name="Choice">
-            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarEdiciones'">
-	                <processor-chain doc:name="Processor Chain">
-	                    <db:select config-ref="MySQL_Configuration" doc:name="Database">
-	                        <db:parameterized-query><![CDATA[select * from edicion]]></db:parameterized-query>
-	                    </db:select>
-	                </processor-chain>
-            </when>
-            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarEdicion'">
-	                <processor-chain doc:name="Processor Chain">
-	                <set-session-variable variableName="codigo" value="#[payload[0]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="nombre" value="#[payload[1]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="isbn" value="#[payload[2]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="issn" value="#[payload[3]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="editor" value="#[payload[4]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="fechaEditor" value="#[payload[5]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="ano" value="#[payload[6]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="paginaWeb" value="#[payload[7]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="categoria" value="#[payload[8]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="clasificado" value="#[payload[9]]" doc:name="Session Variable"/> 
-	                <set-session-variable variableName="codigoGrupoInvestigacion" value="#[payload[10]]" doc:name="Session Variable"/>
-	                    <db:insert config-ref="MySQL_Configuration" doc:name="Database">
-	                        <db:parameterized-query><![CDATA[insert into est_comunicacion_conocimiento (k_codigo,n_titulo,n_isbn,n_issn,i_editor,
+	<flow name="flujo-edicion">
+		<http:listener config-ref="HTTP_colciencias_Configuration"
+			path="/flujoEdicion" doc:name="HTTP" />
+		<cxf:jaxws-service doc:name="flujoEdicion" service="edicionService"
+			serviceClass="co.com.ic2.colciencias.ws.IServiceEdicion" />
+		<choice doc:name="Choice">
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarEdiciones'">
+				<processor-chain doc:name="Processor Chain">
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select * from edicion]]></db:parameterized-query>
+					</db:select>
+				</processor-chain>
+			</when>
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarEdicion'">
+				<processor-chain doc:name="Processor Chain">
+					<set-session-variable variableName="codigo"
+						value="#[payload[0]]" doc:name="Session Variable" />
+					<set-session-variable variableName="nombre"
+						value="#[payload[1]]" doc:name="Session Variable" />
+					<set-session-variable variableName="isbn"
+						value="#[payload[2]]" doc:name="Session Variable" />
+					<set-session-variable variableName="issn"
+						value="#[payload[3]]" doc:name="Session Variable" />
+					<set-session-variable variableName="editor"
+						value="#[payload[4]]" doc:name="Session Variable" />
+					<set-session-variable variableName="fechaEditor"
+						value="#[payload[5]]" doc:name="Session Variable" />
+					<set-session-variable variableName="ano"
+						value="#[payload[6]]" doc:name="Session Variable" />
+					<set-session-variable variableName="paginaWeb"
+						value="#[payload[7]]" doc:name="Session Variable" />
+					<set-session-variable variableName="categoria"
+						value="#[payload[8]]" doc:name="Session Variable" />
+					<set-session-variable variableName="clasificado"
+						value="#[payload[9]]" doc:name="Session Variable" />
+					<set-session-variable variableName="codigoGrupoInvestigacion"
+						value="#[payload[10]]" doc:name="Session Variable" />
+					<db:insert config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[insert into edicion (k_codigo,n_titulo,n_isbn,n_issn,i_editor,
 	                        i_fecha_editor,i_ano,n_pag_web,c_categoria,b_clasificado,i_cod_grupo_investigacion) values(#[codigo],#[nombre],#[isbn],#[issn],
 	                        #[editor],#[fechaEditor],#[ano],#[paginaWeb],#[categoria],#[clasificado],#[codigoGrupoInvestigacion]])]]></db:parameterized-query>
-	                    </db:insert>
-	                </processor-chain>
-            </when>
-        </choice>
-        <mulexml:object-to-xml-transformer doc:name="Object to XML"/>
-    </flow>
+					</db:insert>
+				</processor-chain>
+			</when>
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarEdiciones'">
+				<processor-chain doc:name="Processor Chain">
+					<set-session-variable variableName="codigoGrupo"
+						value="#[payload[0]]" doc:name="Session Variable" />
+					<set-session-variable variableName="ediciones"
+						value="#[payload[1]]" doc:name="Session Variable" />
+
+					<foreach collection="ediciones" doc:name="For Each"
+						counterVariableName="i" rootMessageVariableName="edicion">
+						<set-variable variableName="edicion" value="#[ediciones[i-1]]"
+							doc:name="Session Variable" />
+
+						<logger message="#[ediciones[i-1].nombre]" level="INFO"
+							doc:name="Logger" />
+
+						<set-variable variableName="autor" value="#[ediciones[i-1].autor]"
+							doc:name="Variable" />
+
+						<logger message="#[autor.nombreCompleto]" level="INFO"
+							doc:name="Logger" />
+
+						<db:select config-ref="MySQL_Configuration" doc:name="Database">
+							<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+						</db:select>
+
+						<logger message="#[payload]" level="INFO" doc:name="Logger" />
+
+						<choice doc:name="Choice">
+							<when expression="#[payload.size() ==0]">
+								<logger message="no existe investigador" level="INFO"
+									doc:name="Logger" />
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+								</db:insert>
+
+								<set-variable variableName="idEditor"
+									value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							</when>
+							<otherwise>
+								<logger message="Investigador #[payload] ya existe"
+									level="INFO" doc:name="Logger" />
+
+								<set-variable variableName="idEditor" value="#[payload[0].k_codigo]"
+									doc:name="Variable" />
+							</otherwise>
+						</choice>
+
+						<logger message="#[idEditor]" level="INFO" doc:name="Logger" />
+
+						<db:insert config-ref="MySQL_Configuration" doc:name="Database">
+							<db:parameterized-query><![CDATA[insert into edicion (n_titulo,n_isbn,n_issn,i_editor,
+	                        f_fecha_editor,i_ano,n_pag_web,c_categoria,b_clasificado,i_cod_grupo_investigacion) values(#[edicion.nombre],#[edicion.isbn],#[edicion.issn],
+	                        #[idEditor],#[edicion.fechaEditor],#[edicion.ano],#[edicion.paginaWeb],#[edicion.categoria],#[edicion.clasificado],#[codigoGrupo])]]></db:parameterized-query>
+						</db:insert>
+
+					</foreach>
+
+
+				</processor-chain>
+			</when>
+		</choice>
+		<mulexml:object-to-xml-transformer
+			doc:name="Object to XML" />
+	</flow>
 </mule>
