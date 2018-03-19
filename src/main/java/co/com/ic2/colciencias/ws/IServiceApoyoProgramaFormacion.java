@@ -1,6 +1,7 @@
 package co.com.ic2.colciencias.ws;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.jws.WebParam;
 import javax.jws.WebService;
@@ -9,7 +10,9 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.ApoyoProgramaFormac
 
 @WebService(name = "serviceApoyoProgramaFormacion")
 public interface IServiceApoyoProgramaFormacion {
-	public String consultarApoyoProgramasFormacion();
+	public List<ApoyoProgramaFormacion> consultarApoyoProgramasFormacion();
+
+	public List<ApoyoProgramaFormacion> consultarApoyoProgramasFormacionGrupo(int codigoGrupo);
 
 	public String insertarApoyoProgramaFormacion(@WebParam(name = "codigo") String codigo,
 			@WebParam(name = "nombre") String nombre, @WebParam(name = "institucion") String institucion,

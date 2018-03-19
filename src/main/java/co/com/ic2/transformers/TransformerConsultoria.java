@@ -12,7 +12,7 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.Consultoria;
 
 public class TransformerConsultoria {
 
-	public static List<Consultoria> getCapitulosLibroPublicados(String jsonConsultorias) {
+	public static List<Consultoria> getConsultorias(String jsonConsultorias) {
 		try {
 			ArrayList<Consultoria> consultorias=new ArrayList<>();
 			JsonParser parser=new JsonParser();
