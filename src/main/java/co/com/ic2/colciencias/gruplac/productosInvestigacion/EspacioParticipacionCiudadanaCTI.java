@@ -16,6 +16,8 @@ public class EspacioParticipacionCiudadanaCTI extends ProductoInvestigacion{
     
     private String nombreComunidad;
     private boolean constanciaParticipacion;
+    
+    private int numeroParticipantes;
 
     public int getAnoInicio() {
         return anoInicio;
@@ -48,5 +50,12 @@ public class EspacioParticipacionCiudadanaCTI extends ProductoInvestigacion{
 	public void setConstanciaParticipacion(boolean constanciaParticipacion) {
 		this.constanciaParticipacion = constanciaParticipacion;
 	}
-    
+
+    public int getNumeroParticipantes() {
+        return numeroParticipantes;
+    }
+
+    public void setNumeroParticipantes(int numeroParticipantes) {
+        this.numeroParticipantes = numeroParticipantes;
+    }
 }

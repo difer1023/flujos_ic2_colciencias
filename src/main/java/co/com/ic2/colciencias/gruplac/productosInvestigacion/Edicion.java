@@ -23,8 +23,7 @@ public class Edicion extends ProductoInvestigacion{
     private String tipo;
     
     
-    private String isbn;
-    private String issn;
+    private String isbn_issn;
     private String fechaEdicion;
     private String url;
 
@@ -84,22 +83,14 @@ public class Edicion extends ProductoInvestigacion{
         this.tipo = tipo;
     }
 
-	public String getIsbn() {
-		return isbn;
+	public String getIssn_Isbn() {
+		return isbn_issn;
 	}
 
-	public void setIsbn(String isbn) {
-		this.isbn = isbn;
+	public void setIssn_Isbn(String isbn_issn) {
+		this.isbn_issn = isbn_issn;
 	}
-
-	public String getIssn() {
-		return issn;
-	}
-
-	public void setIssn(String issn) {
-		this.issn = issn;
-	}
-
+        
 	public String getFechaEdicion() {
 		return fechaEdicion;
 	}
