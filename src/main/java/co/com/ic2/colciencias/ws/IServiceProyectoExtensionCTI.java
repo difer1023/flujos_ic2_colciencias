@@ -8,7 +8,7 @@ import javax.jws.WebService;
 
 import co.com.ic2.colciencias.gruplac.productosInvestigacion.ProyectoExtensionCTI;
 
-@WebService(name = "serviceProyecto")
+@WebService(name = "serviceProyectoExtensionCTI")
 public interface IServiceProyectoExtensionCTI {
 	public List<ProyectoExtensionCTI> consultarProyectosExtensionCTI();
 
