@@ -10,6 +10,9 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.ProyectoExtensionCT
 
 @WebService(name = "serviceProyectoExtensionCTI")
 public interface IServiceProyectoExtensionCTI {
+	
+	public String consultarClasificacionProyectosExtensionCTI(int codigoGrupo);
+	
 	public List<ProyectoExtensionCTI> consultarProyectosExtensionCTI();
 
 	public List<ProyectoExtensionCTI> consultarProyectosExtensionCTIGrupo(int codigoGrupo);

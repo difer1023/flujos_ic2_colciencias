@@ -8,8 +8,11 @@ import javax.jws.WebService;
 
 import co.com.ic2.colciencias.gruplac.productosInvestigacion.EsquemaCircuito;
 
-@WebService(name = "serviceEsquemaCiruito")
+@WebService(name = "serviceEsquemaCircuito")
 public interface IServiceEsquemaCircuito {
+	
+	public String consultarClasificacionEsquemasCircuito(int codigoGrupo);
+	
 	public List<EsquemaCircuito> consultarEsquemasCircuito();
 
 	public List<EsquemaCircuito> consultarEsquemasCircuitoGrupo(int codigoGrupo);

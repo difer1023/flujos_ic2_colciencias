@@ -10,6 +10,9 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.PlantaPiloto;
 
 @WebService(name="servicePlantaPiloto")
 public interface IServicePlantaPiloto {
+	
+	public String consultarClasificacionPlantasPiloto(int codigoGrupo);
+	
 	public List<PlantaPiloto> consultarPlantasPiloto();
 	
 	public List<PlantaPiloto> consultarPlantasPilotoGrupo(int codigoGrupo);

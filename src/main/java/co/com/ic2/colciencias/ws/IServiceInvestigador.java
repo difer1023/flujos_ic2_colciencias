@@ -9,6 +9,9 @@ import co.com.ic2.colciencias.gruplac.Investigador;
 
 @WebService(name="serviceInvestigador")
 public interface IServiceInvestigador {
+	
+	public String consultarInvestigadoresGrupo(int codigoGrupo);
+	
 	public String consultarInvestigadores();
 	public String insertarInvestigador(@WebParam(name="codigo") String codigo,@WebParam(name="nombre") String nombre,@WebParam(name="categoria") String categoria);
 	

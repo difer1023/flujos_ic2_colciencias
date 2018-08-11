@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
+<mule xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:json="http://www.mulesoft.org/schema/mule/json"
 	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
 	xmlns:apikit-soap="http://www.mulesoft.org/schema/mule/apikit-soap"
 	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
@@ -15,18 +15,701 @@ http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
 http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
-http://www.mulesoft.org/schema/mule/apikit-soap http://www.mulesoft.org/schema/mule/apikit-soap/current/mule-apikit-soap.xsd">
+http://www.mulesoft.org/schema/mule/apikit-soap http://www.mulesoft.org/schema/mule/apikit-soap/current/mule-apikit-soap.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
 
 	<cxf:configuration name="CXF_Configuration"
 		enableMuleSoapHeaders="true" initializeStaticBusInstance="true"
 		doc:name="CXF Configuration" />
+
+	<spring:beans>
+		<spring:bean class="co.com.ic2.colciencias.calculos.TestCalculos"
+			name="invokeSpringBean"></spring:bean>
+	</spring:beans>
+
 	<flow name="flujo-grupo-investigacionFlow">
 		<http:listener config-ref="HTTP_colciencias_Configuration"
 			path="/flujoGrupoInvestigacion" doc:name="HTTP" />
 		<cxf:jaxws-service doc:name="flujoGruposInvestigacion"
 			configuration-ref="CXF_Configuration" service="gruposInvestigacionService"
-			serviceClass="co.com.ic2.colciencias.ws.IServiceGrupoInvestigacion" />
+			serviceClass="co.com.ic2.colciencias.ws.IServiceGrupoInvestigacion"
+			namespace="ws.colciencias.ic2.com.co" />
 		<choice doc:name="Choice">
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarClasificacionesGrupoInvestigacion'">
+				<processor-chain doc:name="Processor Chain">
+					<set-session-variable variableName="codigoGrupo"
+						value="#[payload[0]]" doc:name="Session Variable" />
+					<set-session-variable variableName="anoFinVentanaObservacion"
+						value="#[payload[1]]" doc:name="Session Variable" />
+
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select c_categoria, count(c_categoria) numero from(
+								select apf.k_codigo, apf.c_categoria from apoyo_prog_f apf 
+								where apf.i_cod_grupo_investigacion=#[codigoGrupo] 
+								and apf.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_AP})-1)] and #[anoFinVentanaObservacion]
+								and apf.c_categoria is not null
+								and apf.k_codigo not in (SELECT t1.k_codigo FROM apoyo_prog_f t1
+									INNER JOIN apoyo_prog_f t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								
+								UNION ALL
+								
+								select a.k_codigo,a.c_categoria from articulo a, 
+								articulo_autor au 
+								where a.k_codigo=au.i_cod_articulo
+								and au.i_cod_grupo_investigacion=#[codigoGrupo]
+								and a.c_categoria not like "ART_D"
+								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_ART})-1)] and #[anoFinVentanaObservacion]
+								and a.c_categoria is not null
+								and a.k_codigo not in (SELECT t1.k_codigo FROM articulo t1
+									INNER JOIN articulo t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by a.k_codigo
+								
+								UNION ALL
+								
+								select a.k_codigo,a.c_categoria from articulo a, 
+								articulo_autor au 
+								where a.k_codigo=au.i_cod_articulo
+								and au.i_cod_grupo_investigacion=#[codigoGrupo]
+								and a.c_categoria like "ART_D"
+								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_ART_D})-1)] and #[anoFinVentanaObservacion]
+								and a.k_codigo not in (SELECT t1.k_codigo FROM articulo t1
+									INNER JOIN articulo t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by a.k_codigo
+								
+								UNION ALL
+								
+								select b.k_codigo,b.c_categoria from boletin b, 
+								boletin_autor bau 
+								where b.k_codigo=bau.i_cod_boletin
+								and bau.i_cod_grupo_investigacion=#[codigoGrupo]
+								and b.i_ano_elaboracion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_BOL})-1)] and #[anoFinVentanaObservacion]
+								and b.k_codigo not in (SELECT t1.k_codigo FROM boletin t1
+									INNER JOIN boletin t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by b.k_codigo
+								
+								UNION ALL
+								
+								select cli.k_codigo,cli.c_categoria from cap_libro_investigacion cli, 
+								cap_libro_autor cla 
+								where cli.k_codigo=cla.i_cod_cap_libro
+								and cla.i_cod_grupo_investigacion=#[codigoGrupo]
+								and cli.i_ano_publicacion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_CAP_LIB})-1)] and #[anoFinVentanaObservacion]
+								and cli.k_codigo not in (SELECT t1.k_codigo FROM cap_libro_investigacion t1
+									INNER JOIN cap_libro_investigacion t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo_cap = t2.n_titulo_cap)
+								group by cli.k_codigo
+								
+								UNION ALL
+								
+								
+								select c.k_codigo,c.c_categoria from consultoria c, 
+								consultoria_autor ca 
+								where c.k_codigo=ca.i_cod_consultoria
+								and ca.i_cod_grupo_investigacion=#[codigoGrupo]
+								and c.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_CON_CT})-1)] and #[anoFinVentanaObservacion]
+								and c.k_codigo not in (SELECT t1.k_codigo FROM consultoria t1
+									INNER JOIN consultoria t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by c.k_codigo
+								
+								UNION ALL
+								
+								select di.k_codigo,di.c_categoria from diseno_industrial di, 
+								diseno_industrial_titular dit 
+								where di.k_codigo=dit.i_cod_diseno_industrial
+								and dit.i_cod_grupo_investigacion=#[codigoGrupo]
+								and di.i_ano_obtencion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_DI})-1)] and #[anoFinVentanaObservacion]
+								and di.k_codigo not in (SELECT t1.k_codigo FROM diseno_industrial t1
+									INNER JOIN diseno_industrial t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo_reg = t2.n_titulo_reg)
+								group by di.k_codigo
+								
+								UNION ALL
+								
+								select dt.k_codigo,dt.c_categoria from doc_trabajo dt, 
+								doc_trabajo_autor dta 
+								where dt.k_codigo=dta.i_cod_doc_trabajo
+								and dta.i_cod_grupo_investigacion=#[codigoGrupo]
+								and dt.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_WP})-1)] and #[anoFinVentanaObservacion]
+								and dt.k_codigo not in (SELECT t1.k_codigo FROM doc_trabajo t1
+									INNER JOIN doc_trabajo t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by dt.k_codigo
+								
+								UNION ALL
+								
+								select k_codigo, c_categoria from
+								edicion
+								where i_cod_grupo_investigacion=#[codigoGrupo]
+								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_ERL})-1)] and #[anoFinVentanaObservacion]
+								and k_codigo not in (SELECT t1.k_codigo FROM edicion t1
+									INNER JOIN edicion t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								
+								UNION ALL
+								
+								
+								select ebt.k_codigo,ebt.c_categoria from emp_base_tec ebt, 
+								emp_base_tec_autor ebta 
+								where ebt.k_codigo=ebta.i_cod_emp_base_tec
+								and ebt.c_categoria is not null
+								and ebta.i_cod_grupo_investigacion=#[codigoGrupo]
+								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_EBT})-1)] and #[anoFinVentanaObservacion]
+								and ebt.k_codigo not in (SELECT t1.k_codigo FROM emp_base_tec t1
+									INNER JOIN emp_base_tec t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by ebt.k_codigo
+								
+								UNION ALL
+								
+								select epc.k_codigo,epc.c_categoria from espacio_part_proyecto_CTI epc, 
+								espacio_part_proyecto_CTI_autor epca 
+								where epc.k_codigo=epca.i_cod_espacio_part_proyecto_CTI
+								and epca.i_cod_grupo_investigacion=#[codigoGrupo]
+								and epc.i_ano_inicio between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_EPC})-1)] and #[anoFinVentanaObservacion]
+								and epc.k_codigo not in (SELECT t1.k_codigo FROM espacio_part_proyecto_CTI t1
+									INNER JOIN espacio_part_proyecto_CTI t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre_espacio = t2.n_nombre_espacio)
+								group by epc.k_codigo
+								
+								UNION ALL
+								
+								select ec.k_codigo,ec.c_categoria from esq_circuito ec, 
+								esq_circuito_titular ect 
+								where ec.k_codigo=ect.i_cod_esq_circuito
+								and ect.i_cod_grupo_investigacion=#[codigoGrupo]
+								and ec.i_ano_obtencion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_ECI})-1)] and #[anoFinVentanaObservacion]
+								and ec.k_codigo not in (SELECT t1.k_codigo FROM esq_circuito t1
+									INNER JOIN esq_circuito t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo_registro = t2.n_titulo_registro)
+								group by ec.k_codigo
+								
+								UNION ALL
+								
+								select ecc.k_codigo,ecc.c_categoria from est_comunicacion_conocimiento ecc, 
+								est_comunicacion_conocimiento_investigador ecci 
+								where ecc.k_codigo=ecci.i_cod_est_comunicacion_conocimiento
+								and ecci.i_cod_grupo_investigacion=#[codigoGrupo]
+								and ecc.i_ano_inicio between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PCC})-1)] and #[anoFinVentanaObservacion]
+								and ecc.k_codigo not in (SELECT t1.k_codigo FROM est_comunicacion_conocimiento t1
+									INNER JOIN est_comunicacion_conocimiento t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by ecc.k_codigo
+								
+								UNION ALL
+								
+								select k_codigo, c_categoria from
+								est_fomento_CTI
+								where i_cod_grupo_investigacion=#[codigoGrupo]
+								and i_ano_inicio between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_EPA})-1)] and #[anoFinVentanaObservacion]
+								and k_codigo not in (SELECT t1.k_codigo FROM est_fomento_CTI t1
+									INNER JOIN est_fomento_CTI t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								
+								UNION ALL
+								
+								select ec.k_codigo, eci.c_categoria from
+								evento_cientifico_investigador eci,evento_cientifico ec
+								where eci.i_cod_grupo_investigacion=#[codigoGrupo]
+								and eci.i_cod_evento_cientifico=ec.k_codigo
+								and eci.c_categoria is not null
+								and ec.i_ano_inicio between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_EC})-1)] and #[anoFinVentanaObservacion]
+								and ec.k_codigo not in (SELECT t1.k_codigo FROM evento_cientifico t1
+									INNER JOIN evento_cientifico t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								
+								UNION ALL
+								
+								select gci.k_codigo,gci.c_categoria from gen_cont_impreso gci, 
+								gen_cont_impreso_autor gcia
+								where gci.k_codigo=gcia.i_cod_gen_contenido
+								and gcia.i_cod_grupo_investigacion=#[codigoGrupo]
+								and gci.i_ano_publicacion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_GC})-1)] and #[anoFinVentanaObservacion]
+								and gci.k_codigo not in (SELECT t1.k_codigo FROM gen_cont_impreso t1
+									INNER JOIN gen_cont_impreso t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by gci.k_codigo
+								
+								UNION ALL
+								
+								select gcm.k_codigo,gcm.c_categoria from gen_cont_multimedia gcm, 
+								gen_cont_multimedia_participante gcmp
+								where gcm.k_codigo=gcmp.i_cod_gen_cont_multimedia
+								and gcmp.i_cod_grupo_investigacion=#[codigoGrupo]
+								and gcm.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_GC})-1)] and #[anoFinVentanaObservacion]
+								and gcm.k_codigo not in (SELECT t1.k_codigo FROM gen_cont_multimedia t1
+									INNER JOIN gen_cont_multimedia t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by gcm.k_codigo
+								
+								UNION ALL
+								
+								select gcv.k_codigo,gcv.c_categoria from gen_cont_virtual gcv, 
+								gen_cont_virtual_autor gcva
+								where gcv.k_codigo=gcva.i_cod_gen_cont_virtual
+								and gcva.i_cod_grupo_investigacion=#[codigoGrupo]
+								and gcv.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_GC})-1)] and #[anoFinVentanaObservacion]
+								and gcv.k_codigo not in (SELECT t1.k_codigo FROM gen_cont_virtual t1
+									INNER JOIN gen_cont_virtual t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by gcv.k_codigo
+								
+								UNION ALL
+								
+								select ifi.k_codigo,ifi.c_categoria from informe_final ifi, 
+								informe_final_autor ifia
+								where ifi.k_codigo=ifia.i_cod_informe_final
+								and ifia.i_cod_grupo_investigacion=#[codigoGrupo]
+								and ifi.i_ano_elaboracion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_IFI})-1)] and #[anoFinVentanaObservacion]
+								and ifi.k_codigo not in (SELECT t1.k_codigo FROM informe_final t1
+									INNER JOIN informe_final t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by ifi.k_codigo
+								
+								UNION ALL
+								
+								select it.k_codigo,it.c_categoria from informe_tec it, 
+								informe_tec_autor ita
+								where it.k_codigo=ita.i_cod_informe
+								and ita.i_cod_grupo_investigacion=#[codigoGrupo]
+								and it.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_INF})-1)] and #[anoFinVentanaObservacion]
+								and it.k_codigo not in (SELECT t1.k_codigo FROM informe_tec t1
+									INNER JOIN informe_tec t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by it.k_codigo
+								
+								UNION ALL
+								
+								select ip.k_codigo,ip.c_categoria from innovacion_ps ip, 
+								innovacion_ps_autor ipa
+								where ip.k_codigo=ipa.i_cod_innovacion_ps
+								and ipa.i_cod_grupo_investigacion=#[codigoGrupo]
+								and ip.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_IPP})-1)] and #[anoFinVentanaObservacion]
+								and ip.k_codigo not in (SELECT t1.k_codigo FROM innovacion_ps t1
+									INNER JOIN innovacion_ps t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by ip.k_codigo
+								
+								UNION ALL
+								
+								select li.k_codigo,li.c_categoria from libro_investigacion li, 
+								libro_autor la 
+								where li.k_codigo=la.i_cod_libro
+								and la.i_cod_grupo_investigacion=#[codigoGrupo]
+								and li.i_ano_publicacion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_LIB})-1)] and #[anoFinVentanaObservacion]
+								#and li.k_codigo not in (SELECT t1.k_codigo FROM libro_investigacion t1
+									#		INNER JOIN libro_investigacion t2 
+									#		WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by li.k_codigo
+								
+								UNION ALL
+								
+								select k_codigo, c_categoria numero from
+								part_ciud_proyecto_CTI
+								where i_cod_grupo_investigacion=#[codigoGrupo]
+								and i_ano_inicio between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PPC})-1)] and #[anoFinVentanaObservacion]
+								and k_codigo not in (SELECT t1.k_codigo FROM part_ciud_proyecto_CTI t1
+									INNER JOIN part_ciud_proyecto_CTI t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								
+								UNION ALL
+								
+								select p.k_codigo,p.c_categoria from patente p, 
+								patente_grupo_inv pg 
+								where p.k_codigo=pg.i_cod_patente
+								and pg.i_cod_grupo_investigacion=#[codigoGrupo]
+								and p.i_ano_obtencion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PA})-1)] and #[anoFinVentanaObservacion]
+								group by p.k_codigo
+								
+								UNION ALL
+								
+								select pp.k_codigo,pp.c_categoria from planta_piloto pp, 
+								planta_piloto_autor ppa
+								where pp.k_codigo=ppa.i_cod_planta_piloto
+								and ppa.i_cod_grupo_investigacion=#[codigoGrupo]
+								and pp.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PP})-1)] and #[anoFinVentanaObservacion]
+								and pp.k_codigo not in (SELECT t1.k_codigo FROM planta_piloto t1
+									INNER JOIN planta_piloto t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by pp.k_codigo
+								
+								UNION ALL
+								
+								select k_codigo, c_categoria from
+								programa_ondas
+								where i_cod_grupo_investigacion=#[codigoGrupo]
+								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_APO})-1)] and #[anoFinVentanaObservacion]
+								and k_codigo not in (SELECT t1.k_codigo FROM programa_ondas t1
+									INNER JOIN programa_ondas t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								
+								UNION ALL
+								
+								select pi.k_codigo,pi.c_categoria from prototipo_ind pi, 
+								prototipo_ind_autor pia
+								where pi.k_codigo=pia.i_cod_prototipo_ind
+								and pia.i_cod_grupo_investigacion=#[codigoGrupo]
+								and pi.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PI})-1)] and #[anoFinVentanaObservacion]
+								and pi.k_codigo not in (SELECT t1.k_codigo FROM prototipo_ind t1
+									INNER JOIN prototipo_ind t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by pi.k_codigo
+								
+								UNION ALL
+								
+								select p.k_codigo,p.c_categoria from proyecto p, 
+								proyecto_investigador pi
+								where p.k_codigo=pi.i_cod_proyecto
+								and pi.i_cod_grupo_investigacion=#[codigoGrupo]
+								and p.c_categoria like "PID%"
+								and p.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PID})-1)] and #[anoFinVentanaObservacion]
+								and p.k_codigo not in (SELECT t1.k_codigo FROM proyecto t1
+									INNER JOIN proyecto t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by p.k_codigo
+								
+								UNION ALL
+								
+								select p.k_codigo,p.c_categoria from proyecto p, 
+								proyecto_investigador pi
+								where p.k_codigo=pi.i_cod_proyecto
+								and pi.i_cod_grupo_investigacion=#[codigoGrupo]
+								and p.c_categoria like "PF%"
+								and p.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PF})-1)] and #[anoFinVentanaObservacion]
+								and p.k_codigo not in (SELECT t1.k_codigo FROM proyecto t1
+									INNER JOIN proyecto t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by p.k_codigo
+								
+								UNION ALL
+								
+								select p.k_codigo,p.c_categoria from proyecto p, 
+								proyecto_investigador pi
+								where p.k_codigo=pi.i_cod_proyecto
+								and pi.i_cod_grupo_investigacion=#[codigoGrupo]
+								and p.c_categoria like "PIC%"
+								and p.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PIC})-1)] and #[anoFinVentanaObservacion]
+								and p.k_codigo not in (SELECT t1.k_codigo FROM proyecto t1
+									INNER JOIN proyecto t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by p.k_codigo
+								
+								UNION ALL
+								
+								select p.k_codigo,p.c_categoria from proyecto_ext_CTI p, 
+								proyecto_ext_CTI_investigador pi
+								where p.k_codigo=pi.i_cod_proyecto_ext
+								and pi.i_cod_grupo_investigacion=#[codigoGrupo]
+								and p.i_ano_inicio between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PE})-1)] and #[anoFinVentanaObservacion]
+								and p.k_codigo not in (SELECT t1.k_codigo FROM proyecto_ext_CTI t1
+									INNER JOIN proyecto_ext_CTI t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by p.k_codigo
+								
+								UNION ALL
+								
+								select k_codigo, c_categoria from
+								red_conocimiento
+								where i_cod_grupo_investigacion=#[codigoGrupo]
+								and i_ano_inicio between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_RC})-1)] and #[anoFinVentanaObservacion]
+								and k_codigo not in (SELECT t1.k_codigo FROM red_conocimiento t1
+									INNER JOIN red_conocimiento t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								
+								UNION ALL
+								
+								select se.k_codigo,se.c_categoria from secreto_emp se, 
+								secreto_emp_autor sea
+								where se.k_codigo=sea.i_cod_secreto_emp
+								and sea.i_cod_grupo_investigacion=#[codigoGrupo]
+								and se.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_SE})-1)] and #[anoFinVentanaObservacion]
+								and se.k_codigo not in (SELECT t1.k_codigo FROM secreto_emp t1
+									INNER JOIN secreto_emp t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by se.k_codigo
+								
+								UNION ALL
+								
+								select sd.k_codigo,sd.c_categoria from signos_dis sd, 
+								signos_dis_titular sdt
+								where sd.k_codigo=sdt.i_cod_signos_dis
+								and sdt.i_cod_grupo_investigacion=#[codigoGrupo]
+								and sd.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_SD})-1)] and #[anoFinVentanaObservacion]
+								and sd.k_codigo not in (SELECT t1.k_codigo FROM signos_dis t1
+									INNER JOIN signos_dis t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by sd.k_codigo
+								
+								UNION ALL
+								
+								select sf.k_codigo,sf.c_categoria from software sf, 
+								software_autor sfa
+								where sf.k_codigo=sfa.i_cod_software
+								and sfa.i_cod_grupo_investigacion=#[codigoGrupo]
+								and sf.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_SF})-1)] and #[anoFinVentanaObservacion]
+								and sf.k_codigo not in (SELECT t1.k_codigo FROM software t1
+									INNER JOIN software t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by sf.k_codigo
+								
+								UNION ALL
+								
+								select tg.k_codigo,tg.c_categoria from trabajo_grado tg, 
+								trabajo_grado_director tga
+								where tg.k_codigo=tga.i_cod_trabajo_grado
+								and tga.i_cod_grupo_investigacion=#[codigoGrupo]
+								and tg.c_categoria like "TP%"
+								and tg.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_TP})-1)] and #[anoFinVentanaObservacion]
+								and tg.k_codigo not in (SELECT t1.k_codigo FROM trabajo_grado t1
+									INNER JOIN trabajo_grado t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by tg.k_codigo
+								
+								UNION ALL
+								
+								select tg.k_codigo,tg.c_categoria from trabajo_grado tg, 
+								trabajo_grado_director tga
+								where tg.k_codigo=tga.i_cod_trabajo_grado
+								and tga.i_cod_grupo_investigacion=#[codigoGrupo]
+								and tg.c_categoria like "TM%"
+								and tg.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_TM})-1)] and #[anoFinVentanaObservacion]
+								and tg.k_codigo not in (SELECT t1.k_codigo FROM trabajo_grado t1
+									INNER JOIN trabajo_grado t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by tg.k_codigo
+								
+								UNION ALL
+								
+								select tg.k_codigo,tg.c_categoria from trabajo_grado tg, 
+								trabajo_grado_director tga
+								where tg.k_codigo=tga.i_cod_trabajo_grado
+								and tga.i_cod_grupo_investigacion=#[codigoGrupo]
+								and tg.c_categoria like "TD%"
+								and tg.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_TP})-1)] and #[anoFinVentanaObservacion]
+								and tg.k_codigo not in (SELECT t1.k_codigo FROM trabajo_grado t1
+									INNER JOIN trabajo_grado t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by tg.k_codigo
+								
+								) as clasificaciones_grupo
+								where c_categoria is not null
+								group by c_categoria;]]></db:parameterized-query>
+					</db:select>
+					<json:object-to-json-transformer
+						doc:name="Object to JSON" />
+					<set-session-variable variableName="clasificacionesGrupo"
+						value="#[payload]" doc:name="Session Variable" />
+
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select sum(integrantes) integrantes_grupo,sum(grupos) grupos_colaboracion from(
+
+								select a.k_codigo,a.c_categoria,sum(au.i_integrante_grupo) integrantes,sum(au.i_grupos_colaboracion) grupos from articulo a, 
+								articulo_autor au 
+								where a.k_codigo=au.i_cod_articulo
+								and au.i_cod_grupo_investigacion=#[codigoGrupo]
+								and a.c_categoria not like "ART_D"
+								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_ART})-1)] and #[anoFinVentanaObservacion]
+								and a.c_categoria is not null
+								and a.k_codigo not in (SELECT t1.k_codigo FROM articulo t1
+									INNER JOIN articulo t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by a.k_codigo
+								
+								UNION ALL
+								
+								select a.k_codigo,a.c_categoria,sum(au.i_integrante_grupo) integrantes,sum(au.i_grupos_colaboracion) grupos from articulo a, 
+								articulo_autor au 
+								where a.k_codigo=au.i_cod_articulo
+								and au.i_cod_grupo_investigacion=#[codigoGrupo]
+								and a.c_categoria like "ART_D"
+								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_ART_D})-1)] and #[anoFinVentanaObservacion]
+								and a.k_codigo not in (SELECT t1.k_codigo FROM articulo t1
+									INNER JOIN articulo t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by a.k_codigo
+								
+								
+								UNION ALL
+								
+								select cli.k_codigo,cli.c_categoria,sum(cla.i_integrante_grupo) integrantes,sum(cla.i_grupos_colaboracion) grupos from cap_libro_investigacion cli, 
+								cap_libro_autor cla 
+								where cli.k_codigo=cla.i_cod_cap_libro
+								and cla.i_cod_grupo_investigacion=#[codigoGrupo]
+								and cli.i_ano_publicacion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_CAP_LIB})-1)] and #[anoFinVentanaObservacion]
+								and cli.k_codigo not in (SELECT t1.k_codigo FROM cap_libro_investigacion t1
+									INNER JOIN cap_libro_investigacion t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo_cap = t2.n_titulo_cap)
+								group by cli.k_codigo
+								
+								UNION ALL
+								
+								
+								select c.k_codigo,c.c_categoria,sum(ca.i_integrante_grupo) integrantes,sum(ca.i_grupos_colaboracion) grupos from consultoria c, 
+								consultoria_autor ca 
+								where c.k_codigo=ca.i_cod_consultoria
+								and ca.i_cod_grupo_investigacion=#[codigoGrupo]
+								and c.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_CON_CT})-1)] and #[anoFinVentanaObservacion]
+								and c.k_codigo not in (SELECT t1.k_codigo FROM consultoria t1
+									INNER JOIN consultoria t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by c.k_codigo
+								
+								UNION ALL
+								
+								select di.k_codigo,di.c_categoria,sum(dit.i_integrante_grupo) integrantes,sum(dit.i_grupos_colaboracion) grupos from diseno_industrial di, 
+								diseno_industrial_titular dit 
+								where di.k_codigo=dit.i_cod_diseno_industrial
+								and dit.i_cod_grupo_investigacion=#[codigoGrupo]
+								and di.i_ano_obtencion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_DI})-1)] and #[anoFinVentanaObservacion]
+								and di.k_codigo not in (SELECT t1.k_codigo FROM diseno_industrial t1
+									INNER JOIN diseno_industrial t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo_reg = t2.n_titulo_reg)
+								group by di.k_codigo
+								
+								UNION ALL
+								
+								
+								select ebt.k_codigo,ebt.c_categoria,sum(ebta.i_integrante_grupo) integrantes,sum(ebta.i_grupos_colaboracion) grupos from emp_base_tec ebt, 
+								emp_base_tec_autor ebta 
+								where ebt.k_codigo=ebta.i_cod_emp_base_tec
+								and ebt.c_categoria is not null
+								and ebta.i_cod_grupo_investigacion=#[codigoGrupo]
+								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_EBT})-1)] and #[anoFinVentanaObservacion]
+								and ebt.k_codigo not in (SELECT t1.k_codigo FROM emp_base_tec t1
+									INNER JOIN emp_base_tec t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by ebt.k_codigo
+								
+								UNION ALL
+								
+								
+								select ec.k_codigo,ec.c_categoria,sum(ect.i_integrante_grupo) integrantes,sum(ect.i_grupos_colaboracion) grupos from esq_circuito ec, 
+								esq_circuito_titular ect 
+								where ec.k_codigo=ect.i_cod_esq_circuito
+								and ect.i_cod_grupo_investigacion=#[codigoGrupo]
+								and ec.i_ano_obtencion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_ECI})-1)] and #[anoFinVentanaObservacion]
+								and ec.k_codigo not in (SELECT t1.k_codigo FROM esq_circuito t1
+									INNER JOIN esq_circuito t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo_registro = t2.n_titulo_registro)
+								group by ec.k_codigo
+								
+								
+								UNION ALL
+								
+								select it.k_codigo,it.c_categoria,sum(ita.i_integrante_grupo) integrantes,sum(ita.i_grupos_colaboracion) grupos from informe_tec it, 
+								informe_tec_autor ita
+								where it.k_codigo=ita.i_cod_informe
+								and ita.i_cod_grupo_investigacion=#[codigoGrupo]
+								and it.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_INF})-1)] and #[anoFinVentanaObservacion]
+								and it.k_codigo not in (SELECT t1.k_codigo FROM informe_tec t1
+									INNER JOIN informe_tec t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by it.k_codigo
+								
+								UNION ALL
+								
+								select ip.k_codigo,ip.c_categoria,sum(ipa.i_integrante_grupo) integrantes,sum(ipa.i_grupos_colaboracion) grupos from innovacion_ps ip, 
+								innovacion_ps_autor ipa
+								where ip.k_codigo=ipa.i_cod_innovacion_ps
+								and ipa.i_cod_grupo_investigacion=#[codigoGrupo]
+								and ip.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_IPP})-1)] and #[anoFinVentanaObservacion]
+								and ip.k_codigo not in (SELECT t1.k_codigo FROM innovacion_ps t1
+									INNER JOIN innovacion_ps t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by ip.k_codigo
+								
+								UNION ALL
+								
+								select li.k_codigo,li.c_categoria,sum(la.i_integrante_grupo) integrantes,sum(la.i_grupos_colaboracion) grupos from libro_investigacion li, 
+								libro_autor la 
+								where li.k_codigo=la.i_cod_libro
+								and la.i_cod_grupo_investigacion=#[codigoGrupo]
+								and li.i_ano_publicacion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_LIB})-1)] and #[anoFinVentanaObservacion]
+								#and li.k_codigo not in (SELECT t1.k_codigo FROM libro_investigacion t1
+									#		INNER JOIN libro_investigacion t2 
+									#		WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by li.k_codigo
+								
+								UNION ALL
+								
+								select pp.k_codigo,pp.c_categoria,sum(ppa.i_integrante_grupo) integrantes,sum(ppa.i_grupos_colaboracion) grupos from planta_piloto pp, 
+								planta_piloto_autor ppa
+								where pp.k_codigo=ppa.i_cod_planta_piloto
+								and ppa.i_cod_grupo_investigacion=#[codigoGrupo]
+								and pp.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PP})-1)] and #[anoFinVentanaObservacion]
+								and pp.k_codigo not in (SELECT t1.k_codigo FROM planta_piloto t1
+									INNER JOIN planta_piloto t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by pp.k_codigo
+								
+								UNION ALL
+								
+								select pi.k_codigo,pi.c_categoria,sum(pia.i_integrante_grupo) integrantes,sum(pia.i_grupos_colaboracion) grupos from prototipo_ind pi, 
+								prototipo_ind_autor pia
+								where pi.k_codigo=pia.i_cod_prototipo_ind
+								and pia.i_cod_grupo_investigacion=#[codigoGrupo]
+								and pi.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PI})-1)] and #[anoFinVentanaObservacion]
+								and pi.k_codigo not in (SELECT t1.k_codigo FROM prototipo_ind t1
+									INNER JOIN prototipo_ind t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by pi.k_codigo
+								
+								UNION ALL
+								
+								select se.k_codigo,se.c_categoria,sum(sea.i_integrante_grupo) integrantes,sum(sea.i_grupos_colaboracion) grupos from secreto_emp se, 
+								secreto_emp_autor sea
+								where se.k_codigo=sea.i_cod_secreto_emp
+								and sea.i_cod_grupo_investigacion=#[codigoGrupo]
+								and se.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_SE})-1)] and #[anoFinVentanaObservacion]
+								and se.k_codigo not in (SELECT t1.k_codigo FROM secreto_emp t1
+									INNER JOIN secreto_emp t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by se.k_codigo
+								
+								UNION ALL
+								
+								select sd.k_codigo,sd.c_categoria,sum(sdt.i_integrante_grupo) integrantes,sum(sdt.i_grupos_colaboracion) grupos from signos_dis sd, 
+								signos_dis_titular sdt
+								where sd.k_codigo=sdt.i_cod_signos_dis
+								and sdt.i_cod_grupo_investigacion=#[codigoGrupo]
+								and sd.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_SD})-1)] and #[anoFinVentanaObservacion]
+								and sd.k_codigo not in (SELECT t1.k_codigo FROM signos_dis t1
+									INNER JOIN signos_dis t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by sd.k_codigo
+								
+								UNION ALL
+								
+								select sf.k_codigo,sf.c_categoria,sum(sfa.i_integrante_grupo) integrantes,sum(sfa.i_grupos_colaboracion) grupos from software sf, 
+								software_autor sfa
+								where sf.k_codigo=sfa.i_cod_software
+								and sfa.i_cod_grupo_investigacion=#[codigoGrupo]
+								and sf.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_SF})-1)] and #[anoFinVentanaObservacion]
+								and sf.k_codigo not in (SELECT t1.k_codigo FROM software t1
+									INNER JOIN software t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by sf.k_codigo
+								
+								) as clasificaciones_grupo
+								where c_categoria is not null]]></db:parameterized-query>
+					</db:select>
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+					<set-session-variable variableName="perfilesColaboracion"
+						value="#[payload]" doc:name="Session Variable" />
+
+					<invoke object-ref="invokeSpringBean" method="getClasificacionInformacion"
+						doc:name="Invoke" methodArguments="#[clasificacionesGrupo],
+						#[perfilesColaboracion]" />
+ 
+
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+				</processor-chain>
+			</when>
 			<when evaluator="groovy"
 				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarGruposInvestigacion'">
 				<processor-chain doc:name="Processor Chain">

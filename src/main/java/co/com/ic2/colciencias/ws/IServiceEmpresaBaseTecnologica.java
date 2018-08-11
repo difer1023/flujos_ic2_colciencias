@@ -8,8 +8,11 @@ import javax.jws.WebService;
 
 import co.com.ic2.colciencias.gruplac.productosInvestigacion.EmpresaBaseTecnologica;
 
-@WebService(name = "serviceEmpresabaseTecnologica")
+@WebService(name = "serviceEmpresaBaseTecnologica")
 public interface IServiceEmpresaBaseTecnologica {
+	
+	public String consultarClasificacionEmpresasBaseTecnologica(int codigoGrupo);
+	
 	public List<EmpresaBaseTecnologica> consultarEmpresasBaseTecnologica();
 
 	public List<EmpresaBaseTecnologica> consultarEmpresasBaseTecnologicaGrupo(int codigoGrupo);

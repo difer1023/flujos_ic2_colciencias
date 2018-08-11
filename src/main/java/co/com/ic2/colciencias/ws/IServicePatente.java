@@ -5,6 +5,9 @@ import javax.jws.WebService;
 
 @WebService(name="servicePatente")
 public interface IServicePatente {
+	
+	public String consultarClasificacionPatentes(int codigoGrupo);
+	
 	public String consultarPatentes ();
 	public String insertarPatente (@WebParam(name="codigo") String codigo,@WebParam(name="numeroPatente") String numeroPatente,
 			@WebParam(name="certificadoPatente") boolean certificadoPatente,@WebParam(name="anoObtencion") String anoObtencion,

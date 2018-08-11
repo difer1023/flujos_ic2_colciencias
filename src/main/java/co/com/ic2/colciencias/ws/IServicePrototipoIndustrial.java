@@ -9,7 +9,10 @@ import javax.jws.WebService;
 import co.com.ic2.colciencias.gruplac.productosInvestigacion.PrototipoIndustrial;
 
 @WebService(name="servicePrototipoIndustrial")
-public interface IServicePrototipoIndustrial {
+public interface IServicePrototipoIndustrial {Object clone() throws CloneNotSupportedException;
+
+	public String consultarClasificacionPrototiposIndustriales(int codigoGrupo);
+
 	public List<PrototipoIndustrial> consultarPrototiposIndustriales();
 	
 	public List<PrototipoIndustrial> consultarPrototiposIndustrialesGrupo(int codigoGrupo);

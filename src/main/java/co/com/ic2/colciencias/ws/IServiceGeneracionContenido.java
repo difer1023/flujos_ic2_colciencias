@@ -12,6 +12,9 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.GeneracionContenido
 
 @WebService(name = "serviceGeneracionContenido")
 public interface IServiceGeneracionContenido {
+	
+	public String consultarClasificacionGeneracionContenidosImpresos(int codigoGrupo);
+	
 	public List<GeneracionContenidoImpreso> consultarGeneracionContenidosImpresos();
 
 	public List<GeneracionContenidoImpreso> consultarGeneracionContenidosImpresosGrupo(int codigoGrupo);
@@ -26,6 +29,8 @@ public interface IServiceGeneracionContenido {
 	public String insertarGeneracionContenidosImpresos(@WebParam(name = "codigoGrupo") String codigo,
 			@WebParam(name = "contenidosImpresos") ArrayList<GeneracionContenidoImpreso> contenidosImpresos);
 
+	public String consultarClasificacionGeneracionContenidosMultimedia(int codigoGrupo);
+	
 	public List<GeneracionContenidoMultimedia> consultarGeneracionContenidosMultimedia();
 
 	public List<GeneracionContenidoMultimedia> consultarGeneracionContenidosMultimediaGrupo(int codigoGrupo);
@@ -40,6 +45,8 @@ public interface IServiceGeneracionContenido {
 	public String insertarGeneracionContenidosMultimedia(@WebParam(name = "codigoGrupo") String codigo,
 			@WebParam(name = "contenidosMultimedia") ArrayList<GeneracionContenidoMultimedia> contenidosMultimedia);
 
+	public String consultarClasificacionGeneracionContenidosVirtuales(int codigoGrupo);
+	
 	public List<GeneracionContenidoVirtual> consultarGeneracionContenidosVirtuales();
 
 	public List<GeneracionContenidoVirtual> consultarGeneracionContenidosVirtualesGrupo(int codigoGrupo);

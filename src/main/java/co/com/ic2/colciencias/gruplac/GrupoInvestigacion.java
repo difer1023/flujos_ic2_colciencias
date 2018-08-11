@@ -37,58 +37,116 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.SignoDistintivo;
 import co.com.ic2.colciencias.gruplac.productosInvestigacion.Software;
 import co.com.ic2.colciencias.gruplac.productosInvestigacion.TrabajoGrado;
 import java.util.ArrayList;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  *
  * @author L
  */
+
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlType(name = "GrupoInvestigacion",namespace = "gruplac.colciencias.ic2.com.co")
 public class GrupoInvestigacion {
-	private int codigo;
+    
+    @XmlElement(name = "codigo")
+    private int codigo;
+    @XmlElement(name = "nombre")
     private String nombre;
+    @XmlElement(name = "anoMesFormacion")
     private String anoMesFormacion;
+    @XmlElement(name = "departamento")
     private String departamento;
+    @XmlElement(name = "ciudad")
     private String ciudad;
+    @XmlElement(name = "lider")
     private String lider;
+    @XmlElement(name = "infoCertificacion")
     private String infoCertificacion;
+    @XmlElement(name = "pagWeb")
     private String pagWeb;
+    @XmlElement(name = "email")
     private String email;
+    @XmlElement(name = "clasificacion")
     private String clasificacion;
+    @XmlElement(name = "areaConocimiento")
     private String areaConocimiento;
+    @XmlElement(name = "programaCienciaTecnologia")
     private String programaCienciaTecnologia;
+    @XmlElement(name = "programaCienciaTecnologiaSecundario")
     private String programaCienciaTecnologiaSecundario;
+    @XmlElementWrapper(name = "listInstituciones")
+    @XmlElement(name = "instituciones")
     private ArrayList<Institucion> instituciones;
+    @XmlElement(name = "lineasInvestigacion")
     private ArrayList<LineaInvestigacion> lineasInvestigacion;
+    @XmlElement(name = "integrantes")
     private ArrayList<Investigador> integrantes;
+    @XmlElement(name = "productosInvestigacion")
     private ArrayList<ProductoInvestigacion> productosInvestigacion;
+    @XmlElement(name = "articulosInvestigacion")
     private ArrayList<ArticuloInvestigacion> articulosInvestigacion;
+    @XmlElement(name = "librosResultadoInvestigacion")
     private ArrayList<LibroInvestigacion> librosResultadoInvestigacion;
+    @XmlElement(name = "capituloDeLibro")
     private ArrayList<CapituloLibroPublicado> capituloDeLibro;
+    @XmlElement(name = "documentoTrabajo")
     private ArrayList<DocumentoTrabajo> documentoTrabajo;
+    @XmlElement(name = "otroArticuloPublicado")
     private ArrayList<OtroArticuloPublicado> otroArticuloPublicado;
+    @XmlElement(name = "otroLibroPublicado")
     private ArrayList<OtroLibroPublicado> otroLibroPublicado;
+    @XmlElement(name = "consultoria")
     private ArrayList<Consultoria> consultoria;
+    @XmlElement(name = "disenoIndustrial")
     private ArrayList<DisenoIndustrial> disenoIndustrial;
+    @XmlElement(name = "esquemaCircuito")
     private ArrayList<EsquemaCircuito> esquemaCircuito;
+    @XmlElement(name = "innovacionProceso")
     private ArrayList<InnovacionProcedimientoServicio> innovacionProceso;
+    @XmlElement(name = "plantaPiloto")
     private ArrayList<PlantaPiloto> plantaPiloto;
+    @XmlElement(name = "prototipo")
     private ArrayList<PrototipoIndustrial> prototipo;
+    @XmlElement(name = "signoDistintivo")
     private ArrayList<SignoDistintivo> signoDistintivo;
+    @XmlElement(name = "software")
     private ArrayList<Software> software;
+    @XmlElement(name = "empresaBaseTecnologica")
     private ArrayList<EmpresaBaseTecnologica> empresaBaseTecnologica;
+    @XmlElement(name = "edicion")
     private ArrayList<Edicion> edicion;
+    @XmlElement(name = "eventoCientifico")
     private ArrayList<EventoCientifico> eventoCientifico;
+    @XmlElement(name = "informeInvestigacion")
     private ArrayList<InformeFinalInvestigacion> informeInvestigacion;
+    @XmlElement(name = "redConocimiento")
     private ArrayList<RedConocimiento> redConocimiento;
+    @XmlElement(name = "generacionContenidoImpreso")
     private ArrayList<GeneracionContenidoImpreso> generacionContenidoImpreso;
+    @XmlElement(name = "generacionContenidoMultimedia")
     private ArrayList<GeneracionContenidoMultimedia> generacionContenidoMultimedia;
+    @XmlElement(name = "generacionContenidoVirtual")
     private ArrayList<GeneracionContenidoVirtual> generacionContenidoVirtual;
+    @XmlElement(name = "estrategiaComunicacionConocimiento")
     private ArrayList<EstrategiaComunicacionConocimiento> estrategiaComunicacionConocimiento;
+    @XmlElement(name = "estrategiaPedagogicaFomentoCTI")
     private ArrayList<EstrategiaPedagogicaFomentoCTI> estrategiaPedagogicaFomentoCTI;
+    @XmlElement(name = "espacioParticipacionCiudadana")
     private ArrayList<EspacioParticipacionCiudadanaCTI> espacioParticipacionCiudadana;
+    @XmlElement(name = "participacionCiudadanaProyectoCTI")
     private ArrayList<ParticipacionCiudadanaProyectoCTI> participacionCiudadanaProyectoCTI;
+    @XmlElement(name = "asesoriaProgramaOndas")
     private ArrayList<AsesoriaProgramaOndas> asesoriaProgramaOndas;
+    @XmlElement(name = "trabajoDirigido")
     private ArrayList<TrabajoGrado> trabajoDirigido;
+    @XmlElement(name = "proyecto")
     private ArrayList<Proyecto> proyecto;
+    @XmlElement(name = "apoyoProgramaFormacion")
     private ArrayList<ApoyoProgramaFormacion> apoyoProgramaFormacion;
     
     

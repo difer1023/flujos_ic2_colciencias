@@ -10,6 +10,9 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.DisenoIndustrial;
 
 @WebService(name="serviceDisenoIndustrial")
 public interface IServiceDisenoIndustrial {
+	
+	public String consultarClasificacionDisenosIndustriales(int codigoGrupo);
+	
 	public List<DisenoIndustrial> consultarDisenosIndustriales();
 	
 	public List<DisenoIndustrial> consultarDisenosIndustrialesGrupo(int codigoGrupo);

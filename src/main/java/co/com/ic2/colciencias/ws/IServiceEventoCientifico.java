@@ -10,6 +10,9 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.EventoCientifico;
 
 @WebService(name = "serviceEventoCientifico")
 public interface IServiceEventoCientifico {
+	
+	public String consultarClasificacionEventosCientificos(int codigoGrupo);
+	
 	public List<EventoCientifico> consultarEventosCientificos();
 
 	public List<EventoCientifico> consultarEventosCientificosGrupo(int codigoGrupo);

@@ -10,6 +10,9 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.EspacioParticipacio
 
 @WebService(name="serviceEspacioParticipacionCiudadanaCTI")
 public interface IServiceEspacioParticipacionCiudadanaCTI {
+	
+	public String consultarClasificacionParticipacionesCiudadanasProyectosCTI(int codigoGrupo);
+	
 	public List<EspacioParticipacionCiudadanaCTI> consultarParticipacionesCiudadanasProyectosCTI();
 	
 	public List<EspacioParticipacionCiudadanaCTI> consultarParticipacionesCiudadanasProyectosCTIGrupo(int codigoGrupo);

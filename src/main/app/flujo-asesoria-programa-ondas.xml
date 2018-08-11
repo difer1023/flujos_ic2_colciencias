@@ -23,6 +23,25 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 		<cxf:jaxws-service doc:name="flujoAsesoriaProgramaOndas"
 			service="asesoriaProgramaOndasService" serviceClass="co.com.ic2.colciencias.ws.IServiceAsesoriaProgramaOndas" />
 		<choice doc:name="Choice">
+			<when
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarClasificacionAsesoriasProgramaOndas'"
+				evaluator="groovy">
+				<processor-chain doc:name="Processor Chain">
+				
+				<set-session-variable variableName="codigoGrupo"
+						value="#[payload]" doc:name="Session Variable" />
+						
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select c_categoria, count(c_categoria) numero from
+						programa_ondas
+						where i_cod_grupo_investigacion=#[codigoGrupo]
+						group by c_categoria]]></db:parameterized-query>
+					</db:select>
+				<json:object-to-json-transformer
+						doc:name="Object to JSON" />
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+				</processor-chain>
+			</when>
 			<when evaluator="groovy"
 				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarAsesoriasProgramaOndas'">
 				<processor-chain doc:name="Processor Chain">
@@ -153,6 +172,8 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 						</db:insert>
 
 					</foreach>
+				<mulexml:object-to-xml-transformer
+					doc:name="Object to XML" />
 				</processor-chain>
 			</when>
 		</choice>

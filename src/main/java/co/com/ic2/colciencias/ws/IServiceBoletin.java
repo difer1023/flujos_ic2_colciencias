@@ -5,6 +5,7 @@ import javax.jws.WebService;
 
 @WebService(name="serviceBoletin")
 public interface IServiceBoletin {
+	public String consultarClasificacionBoletines(int codigoGrupo);
 	public String consultarBoletines();
 	public String insertarBoletin(@WebParam(name="codigo") String codigo,@WebParam(name="titulo") String titulo,
 			@WebParam(name="fechaElaboracion") String fechaElaboracion,@WebParam(name="editor") String editor,

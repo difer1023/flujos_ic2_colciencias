@@ -23,6 +23,26 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 		<cxf:jaxws-service doc:name="flujoEdicion" service="edicionService"
 			serviceClass="co.com.ic2.colciencias.ws.IServiceEdicion" />
 		<choice doc:name="Choice">
+			
+			<when
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarClasificacionEdiciones'"
+				evaluator="groovy">
+				<processor-chain doc:name="Processor Chain">
+				
+				<set-session-variable variableName="codigoGrupo"
+						value="#[payload]" doc:name="Session Variable" />
+						
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select c_categoria, count(c_categoria) numero from
+						edicion
+						where i_cod_grupo_investigacion=#[codigoGrupo]
+						group by c_categoria]]></db:parameterized-query>
+					</db:select>
+				<json:object-to-json-transformer
+						doc:name="Object to JSON" />
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+				</processor-chain>
+			</when>
 			<when evaluator="groovy"
 				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarEdiciones'">
 				<processor-chain doc:name="Processor Chain">
@@ -143,14 +163,16 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 						<logger message="#[idEditor]" level="INFO" doc:name="Logger" />
 
 						<db:insert config-ref="MySQL_Configuration" doc:name="Database">
-							<db:parameterized-query><![CDATA[insert into edicion (n_titulo,n_isbn,n_issn,i_editor,
-	                        f_fecha_editor,i_ano,n_pag_web,c_categoria,b_clasificado,i_cod_grupo_investigacion) values(#[edicion.nombre],#[edicion.isbn],#[edicion.issn],
+							<db:parameterized-query><![CDATA[insert into edicion (n_titulo,n_issn_isbn,i_editor,
+	                        f_fecha_editor,i_ano,n_pag_web,c_categoria,b_clasificado,i_cod_grupo_investigacion) values(#[edicion.nombre],#[edicion.isbn_issn],
 	                        #[idEditor],#[edicion.fechaEditor],#[edicion.ano],#[edicion.paginaWeb],#[edicion.categoria],#[edicion.clasificado],#[codigoGrupo])]]></db:parameterized-query>
 						</db:insert>
 
 					</foreach>
 
 
+				<mulexml:object-to-xml-transformer
+					doc:name="Object to XML" />
 				</processor-chain>
 			</when>
 		</choice>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
 	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
@@ -8,6 +9,7 @@
 	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.9.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd 
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
 http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd 
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
@@ -18,6 +20,28 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <http:listener config-ref="HTTP_colciencias_Configuration" path="/flujoPatente" doc:name="HTTP"/>
         <cxf:jaxws-service  doc:name="flujoPatente"  service="patenteService" serviceClass="co.com.ic2.colciencias.ws.IServicePatente"/>
         <choice doc:name="Choice">
+            <when
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarClasificacionPatentes'"
+				evaluator="groovy">
+				<processor-chain doc:name="Processor Chain">
+				
+				<set-session-variable variableName="codigoGrupo"
+						value="#[payload]" doc:name="Session Variable" />
+						
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select c_categoria, count(c_categoria) numero from(
+						select p.k_codigo,p.c_categoria from patente p, 
+						patente_grupo_inv pg 
+						where p.k_codigo=pg.i_cod_patente
+						and pg.i_cod_grupo_investigacion=#[codigoGrupo]
+						group by p.k_codigo) as patente_grupo
+						group by c_categoria]]></db:parameterized-query>
+					</db:select>
+				<json:object-to-json-transformer
+						doc:name="Object to JSON" />
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+				</processor-chain>
+			</when>
             <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarPatentes'">
 	                <processor-chain doc:name="Processor Chain">
 	                    <db:select config-ref="MySQL_Configuration" doc:name="Database">

@@ -24,7 +24,7 @@ public class TransformerEstrategiaPedagogicaFomentoCTI {
 				EstrategiaPedagogicaFomentoCTI estrategiaPedagogicaFomentoCTI=new EstrategiaPedagogicaFomentoCTI();
 				estrategiaPedagogicaFomentoCTI.setCodigo(object.get("k_codigo").getAsInt());
 				estrategiaPedagogicaFomentoCTI.setNombre(object.get("n_nombre").getAsString());
-				estrategiaPedagogicaFomentoCTI.setAnoInicio(object.get("f_fecha_inicio").getAsInt());
+				estrategiaPedagogicaFomentoCTI.setFechaInicio(object.get("f_fecha_inicio").getAsString());
 				Investigador investigador = new Investigador();
 				investigador.setNombreCompleto(object.get("i_investigador_principal").getAsString());
 				estrategiaPedagogicaFomentoCTI.setCertificado(object.get("b_certificado").getAsBoolean());

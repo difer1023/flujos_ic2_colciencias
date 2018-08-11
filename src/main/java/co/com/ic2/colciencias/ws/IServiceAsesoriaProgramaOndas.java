@@ -10,6 +10,9 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.AsesoriaProgramaOnd
 
 @WebService(name = "serviceAsesoriaProgramaOndas")
 public interface IServiceAsesoriaProgramaOndas {
+	
+	public String consultarClasificacionAsesoriasProgramaOndas(int codigoGrupo);
+	
 	public List<AsesoriaProgramaOndas> consultarAsesoriasProgramaOndas();
 
 	public List<AsesoriaProgramaOndas> consultarAsesoriasProgramaOndasGrupo(int codigoGrupo);

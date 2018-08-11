@@ -23,6 +23,28 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 		<cxf:jaxws-service doc:name="flujoDocumentoTrabajo"
 			service="documentoTrabajoService" serviceClass="co.com.ic2.colciencias.ws.IServiceDocumentoTrabajo" />
 		<choice doc:name="Choice">
+			<when
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarClasificacionDocumentosTrabajo'"
+				evaluator="groovy">
+				<processor-chain doc:name="Processor Chain">
+				
+				<set-session-variable variableName="codigoGrupo"
+						value="#[payload]" doc:name="Session Variable" />
+						
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select c_categoria, count(c_categoria) numero from(
+						select dt.k_codigo,dt.c_categoria from doc_trabajo dt, 
+						doc_trabajo_autor dta 
+						where dt.k_codigo=dta.i_cod_doc_trabajo
+						and dta.i_cod_grupo_investigacion=#[codigoGrupo]
+						group by dt.k_codigo) as documento_trabajo_grupo
+						group by c_categoria]]></db:parameterized-query>
+					</db:select>
+				<json:object-to-json-transformer
+						doc:name="Object to JSON" />
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+				</processor-chain>
+			</when>
 			<when evaluator="groovy"
 				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarDocumentoTrabajo'">
 				<processor-chain doc:name="Processor Chain">
@@ -213,6 +235,8 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 
 					</foreach>
 
+				<mulexml:object-to-xml-transformer
+					doc:name="Object to XML" />
 
 				</processor-chain>
 			</when>

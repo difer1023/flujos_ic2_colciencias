@@ -9,21 +9,35 @@ import co.com.ic2.colciencias.gruplac.Institucion;
 import co.com.ic2.colciencias.gruplac.Investigador;
 
 import java.util.ArrayList;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * Clase que representa el producto Estrategia pedagogica para el fomento de CTI
  * @author L
  */
+
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlType(name = "EstrategiaPedagogicaFomentoCTI",namespace = "productosInvestigacion.gruplac.colciencias.ic2.com.co")
 public class EstrategiaPedagogicaFomentoCTI extends ProductoInvestigacion{
     
-    private int anoInicio;
+    @XmlElement(name = "fechaInicio")
+    private String fechaInicio;
+    @XmlElement(name = "descripcion")
     private String descripcion;
+    @XmlElement(name = "tipo")
     private String tipo;
     
+    @XmlElement(name = "instituciones")
     private ArrayList<Institucion> instituciones;
+    @XmlElement(name = "numeroInvestigadoresPrincipales")
     private int numeroInvestigadoresPrincipales;
     
+    @XmlElement(name = "investigador")
     private Investigador investigador;
+    @XmlElement(name = "certificado")
     private boolean certificado;
 
     public Investigador getInvestigador() {
@@ -42,12 +56,12 @@ public class EstrategiaPedagogicaFomentoCTI extends ProductoInvestigacion{
 		this.certificado = certificado;
 	}
 
-	public int getAnoInicio() {
-        return anoInicio;
+	public String getFechaInicio() {
+        return fechaInicio;
     }
 
-    public void setAnoInicio(int anoInicio) {
-        this.anoInicio = anoInicio;
+    public void setFechaInicio(String anoInicio) {
+        this.fechaInicio = anoInicio;
     }
 
     public String getDescripcion() {

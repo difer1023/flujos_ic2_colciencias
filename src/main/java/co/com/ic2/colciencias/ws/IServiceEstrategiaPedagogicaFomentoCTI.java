@@ -10,6 +10,9 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.EstrategiaPedagogic
 
 @WebService(name = "serviceEstrategiaPedagogicaFomentoCTI")
 public interface IServiceEstrategiaPedagogicaFomentoCTI {
+	
+	public String consultarClasificacionEstrategiasPedagogicasFomentoCTI(int codigoGrupo);
+	
 	public List<EstrategiaPedagogicaFomentoCTI> consultarEstrategiasPedagogicasFomentoCTI();
 
 	public List<EstrategiaPedagogicaFomentoCTI> consultarEstrategiasPedagogicasFomentoCTIGrupo(int codigoGrupo);

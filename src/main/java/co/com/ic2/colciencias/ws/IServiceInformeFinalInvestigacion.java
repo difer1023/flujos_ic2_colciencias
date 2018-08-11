@@ -10,6 +10,9 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.InformeFinalInvesti
 
 @WebService(name = "serviceInformeFinalInvestigacion")
 public interface IServiceInformeFinalInvestigacion {
+	
+	public String consultarClasificacionInformesFinalesInvestigacion(int codigoGrupo);
+	
 	public List<InformeFinalInvestigacion> consultarInformesFinalesInvestigacion();
 
 	public List<InformeFinalInvestigacion> consultarInformesFinalesInvestigacionGrupo(int codigoGrupo);

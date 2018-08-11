@@ -22,6 +22,28 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 		<cxf:jaxws-service doc:name="flujoSignoDistintivo"
 			service="signoDistintivoService" serviceClass="co.com.ic2.colciencias.ws.IServiceSignoDistintivo" />
 		<choice doc:name="Choice">
+			<when
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarClasificacionSignosDistintivos'"
+				evaluator="groovy">
+				<processor-chain doc:name="Processor Chain">
+				
+				<set-session-variable variableName="codigoGrupo"
+						value="#[payload]" doc:name="Session Variable" />
+						
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select c_categoria, count(c_categoria) numero from(
+						select sd.k_codigo,sd.c_categoria from signos_dis sd, 
+						signos_dis_titular sdt
+						where sd.k_codigo=sdt.i_cod_signos_dis
+						and sdt.i_cod_grupo_investigacion=#[codigoGrupo]
+						group by sd.k_codigo) as secreto_emp_grupo
+						group by c_categoria]]></db:parameterized-query>
+					</db:select>
+				<json:object-to-json-transformer
+						doc:name="Object to JSON" />
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+				</processor-chain>
+			</when>
 			<when evaluator="groovy"
 				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarSignosDistintivos'">
 				<processor-chain doc:name="Processor Chain">

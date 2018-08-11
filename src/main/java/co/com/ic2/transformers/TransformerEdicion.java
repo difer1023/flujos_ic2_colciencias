@@ -24,8 +24,8 @@ public class TransformerEdicion {
 				Edicion edicion=new Edicion();
 				edicion.setCodigo(object.get("k_codigo").getAsInt());
 				edicion.setNombre(object.get("n_titulo").getAsString());
-				edicion.setIsbn(object.get("n_isbn").getAsString());
-				edicion.setIssn(object.get("n_issn").getAsString());
+				edicion.setIssn_Isbn(object.get("n_isbn_issn").getAsString());
+				
 				Investigador investigador = new Investigador();
 				investigador.setNombreCompleto(object.get("i_editor").getAsString());
 				edicion.setAutor(investigador);

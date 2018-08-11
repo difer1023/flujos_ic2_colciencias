@@ -10,6 +10,8 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.ApoyoProgramaFormac
 
 @WebService(name = "serviceApoyoProgramaFormacion")
 public interface IServiceApoyoProgramaFormacion {
+	public String consultarClasificacionApoyoProgramasFormacion(int codigoGrupo);
+	
 	public List<ApoyoProgramaFormacion> consultarApoyoProgramasFormacion();
 
 	public List<ApoyoProgramaFormacion> consultarApoyoProgramasFormacionGrupo(int codigoGrupo);

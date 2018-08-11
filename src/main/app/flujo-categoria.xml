@@ -33,9 +33,9 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	                        <db:parameterized-query><![CDATA[insert into revista (k_codigo,n_nombre) values(
 	                        #[codigo],#[nombre])]]></db:parameterized-query>
 	                    </db:insert>
+			        <mulexml:object-to-xml-transformer doc:name="Object to XML"/>
 	                </processor-chain>
             </when>
         </choice>
-        <mulexml:object-to-xml-transformer doc:name="Object to XML"/>
     </flow>
 </mule>

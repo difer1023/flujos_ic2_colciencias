@@ -10,6 +10,9 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.RedConocimiento;
 
 @WebService(name="serviceRedConocimiento")
 public interface IServiceRedConocimiento {
+	
+	public String consultarClasificacionRedesConocimiento(int codigoGrupo);
+	
 	public List<RedConocimiento> consultarRedesConocimiento();
 	
 	public List<RedConocimiento> consultarRedesConocimientoGrupo();

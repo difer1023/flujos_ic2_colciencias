@@ -10,6 +10,9 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.SignoDistintivo;
 
 @WebService(name = "serviceSignoDistintivo")
 public interface IServiceSignoDistintivo {
+	
+	public String consultarClasificacionSignosDistintivos(int codigoGrupo);
+	
 	public List<SignoDistintivo> consultarSignosDistintivos();
 
 	public List<SignoDistintivo> consultarSignosDistintivosGrupo(int codigoGrupo);

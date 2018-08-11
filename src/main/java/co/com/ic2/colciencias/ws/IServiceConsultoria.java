@@ -10,6 +10,9 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.Consultoria;
 
 @WebService(name="serviceConsultoria")
 public interface IServiceConsultoria {
+	
+	public String consultarClasificacionConsultorias(int codigoGrupo);
+	
 	public List<Consultoria> consultarConsultorias();
 	
 	public List<Consultoria> consultarConsultoriasGrupo(int codigoGrupo);

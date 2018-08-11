@@ -10,6 +10,9 @@ import co.com.ic2.colciencias.gruplac.productosInvestigacion.EstrategiaComunicac
 
 @WebService(name = "serviceEstrategiaComunicacionConocimiento")
 public interface IServiceEstrategiaComunicacionConocimiento {
+	
+	public String consultarClasificacionEstrategiasComunicacionConocimiento(int codigoGrupo);
+	
 	public List<EstrategiaComunicacionConocimiento> consultarEstrategiasComunicacionConocimiento();
 
 	public List<EstrategiaComunicacionConocimiento> consultarEstrategiasComunicacionConocimientoGrupo(int codigoGrupo);

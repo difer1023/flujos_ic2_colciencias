@@ -2,10 +2,8 @@
 
 <mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
 	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
-	xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
 	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.9.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -19,16 +17,38 @@ http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
 
-<flow name="flujo-evento-cientifico">
-        <http:listener config-ref="HTTP_colciencias_Configuration" path="/flujoEventoCientifico" doc:name="HTTP"/>
-        <cxf:jaxws-service  doc:name="flujoEventoCientifico"  service="eventoCientificoService" serviceClass="co.com.ic2.colciencias.ws.IServiceEventoCientifico"/>
-        <choice doc:name="Choice">
-            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarEventosCientificos'">
-	                <processor-chain doc:name="Processor Chain">
-	                    <db:select config-ref="MySQL_Configuration" doc:name="Database">
-	                        <db:parameterized-query><![CDATA[select * from evento_cientifico]]></db:parameterized-query>
-	                    </db:select>
-	                <json:object-to-json-transformer
+	<flow name="flujo-evento-cientifico">
+		<http:listener config-ref="HTTP_colciencias_Configuration"
+			path="/flujoEventoCientifico" doc:name="HTTP" />
+		<cxf:jaxws-service doc:name="flujoEventoCientifico"
+			service="eventoCientificoService" serviceClass="co.com.ic2.colciencias.ws.IServiceEventoCientifico" />
+		<choice doc:name="Choice">
+			<when
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarClasificacionEventosCientificos'"
+				evaluator="groovy">
+				<processor-chain doc:name="Processor Chain">
+				
+				<set-session-variable variableName="codigoGrupo"
+						value="#[payload]" doc:name="Session Variable" />
+						
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select c_categoria, count(c_categoria) numero from
+						evento_cientifico_investigador
+						where i_cod_grupo_investigacion=#[codigoGrupo]
+						group by c_categoria]]></db:parameterized-query>
+					</db:select>
+				<json:object-to-json-transformer
+						doc:name="Object to JSON" />
+					<logger message="#[payload]" level="INFO" doc:name="Logger" />
+				</processor-chain>
+			</when>
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'consultarEventosCientificos'">
+				<processor-chain doc:name="Processor Chain">
+					<db:select config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[select * from evento_cientifico]]></db:parameterized-query>
+					</db:select>
+					<json:object-to-json-transformer
 						doc:name="Object to JSON" />
 					<logger message="#[payload]" level="INFO" doc:name="Logger" />
 					<scripting:component doc:name="Groovy">
@@ -57,21 +77,112 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 					<logger message="#[payload]" level="INFO" doc:name="Logger" />
 				</processor-chain>
 			</when>
-            <when evaluator="groovy"  expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarEventoCientifico'">
-	                <processor-chain doc:name="Processor Chain">
-	                <set-session-variable variableName="codigo" value="#[payload[0]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="nombre" value="#[payload[1]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="fechaInicio" value="#[payload[2]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="fechaFin" value="#[payload[3]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="entidadPatrocinadora" value="#[payload[4]]" doc:name="Session Variable"/>
-	                <set-session-variable variableName="tipoParticipacion" value="#[payload[5]]" doc:name="Session Variable"/>
-	                    <db:insert config-ref="MySQL_Configuration" doc:name="Database">
-	                        <db:parameterized-query><![CDATA[insert into evento_cientifico (k_codigo,n_nombre,i_fecha_inicio,i_fecha_fin,
-	                        n_entidad_patrocinadora,i_tipo_participacion) values(#[codigo],#[nombre],#[fechaInicio],#[fechaFin],#[entidadPatrocinadora],
-	                        #[tipoParticipacion]])]]></db:parameterized-query>
-	                    </db:insert>
-	                </processor-chain>
-            </when>
-        </choice>
-    </flow>
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarEventoCientifico'">
+				<processor-chain doc:name="Processor Chain">
+					<set-session-variable variableName="codigo"
+						value="#[payload[0]]" doc:name="Session Variable" />
+					<set-session-variable variableName="nombre"
+						value="#[payload[1]]" doc:name="Session Variable" />
+					<set-session-variable variableName="fechaInicio"
+						value="#[payload[2]]" doc:name="Session Variable" />
+					<set-session-variable variableName="fechaFin"
+						value="#[payload[3]]" doc:name="Session Variable" />
+
+					<db:insert config-ref="MySQL_Configuration" doc:name="Database">
+						<db:parameterized-query><![CDATA[insert into evento_cientifico (k_codigo,n_nombre,i_fecha_inicio,i_fecha_fin) values(#[codigo],#[nombre],#[fechaInicio],#[fechaFin])]]></db:parameterized-query>
+					</db:insert>
+				</processor-chain>
+			</when>
+
+			<when evaluator="groovy"
+				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarEventosCientificos'">
+				<processor-chain doc:name="Processor Chain">
+					<set-session-variable variableName="codigoGrupo"
+						value="#[payload[0]]" doc:name="Session Variable" />
+					<set-session-variable variableName="eventosCientificos"
+						value="#[payload[1]]" doc:name="Session Variable" />
+
+					<foreach collection="eventosCientificos" doc:name="For Each"
+						counterVariableName="i" rootMessageVariableName="eventoCientifico">
+						<set-variable variableName="eventoCientifico"
+							value="#[eventosCientificos[i-1]]" doc:name="Session Variable" />
+
+						<logger message="#[eventosCientificos[i-1].nombre]" level="INFO"
+							doc:name="Logger" />
+
+						<db:insert config-ref="MySQL_Configuration"
+							autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+							doc:name="Database">
+							<db:parameterized-query><![CDATA[insert into evento_cientifico (n_nombre,i_ano_inicio,f_fecha_fin) values(#[eventoCientifico.nombre],#[eventoCientifico.ano],#[eventoCientifico.fechaFin])]]></db:parameterized-query>
+						</db:insert>
+						<logger message="#[payload]" level="INFO" doc:name="Logger" />
+						<set-variable variableName="codigoEventoCientifico"
+							value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+						<logger
+							message="Codigo evento cientifico generado #[codigoEventoCientifico]"
+							level="INFO" doc:name="Logger" />
+
+						<set-variable variableName="instituciones"
+							value="#[eventosCientificos[i-1].instituciones]" doc:name="Variable" />
+
+						<foreach collection="instituciones" doc:name="For Each"
+							counterVariableName="j" rootMessageVariableName="institucion">
+							<set-variable variableName="institucion" value="#[instituciones[j-1]]"
+								doc:name="Variable" />
+
+							<logger message="#[institucion.nombre]" level="INFO"
+								doc:name="Logger" />
+
+							<db:select config-ref="MySQL_Configuration" doc:name="Database">
+								<db:parameterized-query><![CDATA[select k_codigo from entidad where n_nombre=#[institucion.nombreCompleto]]]></db:parameterized-query>
+							</db:select>
+
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+
+							<choice doc:name="Choice">
+								<when expression="#[payload.size() ==0]">
+									<logger message="no existe institucion" level="INFO"
+										doc:name="Logger" />
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into entidad (n_nombre,b_institucion) values(#[institucion.nombre],1)]]></db:parameterized-query>
+									</db:insert>
+
+									<set-variable variableName="idInstitucion"
+										value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+								</when>
+								<otherwise>
+									<logger message="Institucion #[payload] ya existe"
+										level="INFO" doc:name="Logger" />
+
+									<set-variable variableName="idInstitucion"
+										value="#[payload[0].k_codigo]" doc:name="Variable" />
+								</otherwise>
+							</choice>
+
+							<logger message="#[idInstitucion]" level="INFO" doc:name="Logger" />
+
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into evento_cientifico_entidad (i_cod_evento_cientifico,i_cod_entidad) values(#[codigoEventoCientifico],#[idInstitucion])]]></db:parameterized-query>
+							</db:insert>
+						</foreach>
+
+						<db:insert config-ref="MySQL_Configuration"
+							autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+							doc:name="Database">
+							<db:parameterized-query><![CDATA[insert into evento_cientifico_investigador (i_cod_evento_cientifico,i_tipo_participacion,c_categoria,b_clasificado,i_cod_grupo_investigacion) values(#[codigoEventoCientifico],(select k_codigo from tipo_participacion_evento where n_nombre=#[eventoCientifico.tipoParticipacion]),#[eventoCientifico.categoria],#[eventoCientifico.clasificado],#[codigoGrupo])]]></db:parameterized-query>
+						</db:insert>
+
+					</foreach>
+					<mulexml:object-to-xml-transformer
+						doc:name="Object to XML" />
+
+				</processor-chain>
+			</when>
+		</choice>
+	</flow>
 </mule>
