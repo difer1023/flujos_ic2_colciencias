@@ -182,7 +182,7 @@ public class ConstantesModelo {
     static final int PG_DI_B = DI_A * PR_DI_B;
     static final int PG_ECI_A = ECI_A * PR_ECI_A;
     static final int PG_PP_A = PP_A * PR_PP_A;
-    //No está en tabla de subtipo de alta calidad
+    //No estï¿½ en tabla de subtipo de alta calidad
     static final int PG_PI_A= DI_A * PR_PI_A;
     static final int PG_SD = SD * PR_SD;
     static final int PG_SE = SE * PR_SE;
@@ -214,7 +214,7 @@ public class ConstantesModelo {
     static final double PG_MB5= MA1 * PR_MB5;
     static final double PG_MC= MA1 * PR_MC;
 
-    //Número de productos
+    //Nï¿½mero de productos
     /*int num_art_a1;
     int num_art_a2;
     int num_art_b;
@@ -280,7 +280,7 @@ public class ConstantesModelo {
     int num_grupos_colaboracion;*/
     
     
-    //Ventana de observación
+    //Ventana de observaciï¿½n
     static int VO_ART = 7;
     static int VO_ART_D = 5;
     static int VO_LIB = 7;
@@ -319,7 +319,7 @@ public class ConstantesModelo {
     //incierta ventana de SD
     static int VO_SD = 5;
 
-    //Cálculo de lambdas
+    //Cï¿½lculo de lambdas
     public static double lambda_art_a2(double num_art_a2) {
         return Math.log((num_art_a2 / VO_ART) + 1);
     }
@@ -630,7 +630,7 @@ public class ConstantesModelo {
     public static double lambda_mc(double num_mc) {
         return Math.log((num_mc / VO_PA) + 1);
     }
-    //Indicadores de producción por tipo de producto
+    //Indicadores de producciï¿½n por tipo de producto
     public static double indicador_top(
             double num_art_a1, double num_art_a2, double num_lib_a1, double num_lib_a,
             double num_cap_lib_a1, double num_cap_lib_a, double num_pa1, double num_pa2,
@@ -751,17 +751,47 @@ public class ConstantesModelo {
                 (PG_APO*lambda_apo(num_apo));
     }
     
-    //Cálculo de máximos
-    static final double max_indicador_top = 5909.85278958868;
-    static final double max_indicador_a = 9108.145353597760;
-    static final double max_indicador_b = 2516.73536068591;
-    static final double max_indicador_apropiacion_conocimiento = 18365.0019580435;
-    static final double max_indicador_formacion_rec_humano_a = 4366.06013943125;
-    static final double max_indicador_formacion_rec_humano_b = 4045.45091902964;
+    //Cï¿½lculo de mï¿½ximos
+    static final double max_indicador_top = 6090.328979711094;
+    static final double q2_indicador_top = 1142.920446841762;
+    static final double q3_indicador_top = 570.6799103019719;
+    static final double q4_indicador_top = 251.314428280906;
+    static final double min_indicador_top = 80.11883557471354;
+    static final double max_indicador_a = 7736.620074882612;
+    static final double q2_indicador_a = 999.856383717871;
+    static final double q3_indicador_a = 517.3923685555783;
+    static final double q4_indicador_a = 242.60151319598086;
+    static final double min_indicador_a = 25.525017951153643;
+    static final double max_indicador_b = 2457.674039625315;
+    static final double q2_indicador_b = 120.8248538735827;
+    static final double q3_indicador_b = 55.191194439100556;
+    static final double q4_indicador_b = 29.389333245105952;
+    static final double min_indicador_b = 9.116077839697729;
+    static final double max_indicador_apropiacion_conocimiento = 8025.416486177556;
+    static final double q2_indicador_apropiacion_conocimiento = 3167.521216172191;
+    static final double q3_indicador_apropiacion_conocimiento = 2239.381549575539;
+    static final double q4_indicador_apropiacion_conocimiento = 1439.3890711832844;
+    static final double min_indicador_apropiacion_conocimiento = 91.16077839697729;
+    static final double max_indicador_formacion_rec_humano_a = 2003.6548166256669;
+    static final double q2_indicador_formacion_rec_humano_a = 576.5502369760898;
+    static final double q3_indicador_formacion_rec_humano_a = 328.1788022291182;
+    static final double q4_indicador_formacion_rec_humano_a = 182.32155679395458;
+    static final double min_indicador_formacion_rec_humano_a = 91.16077839697729;
+    static final double max_indicador_formacion_rec_humano_b = 4061.451630118042;
+    static final double q2_indicador_formacion_rec_humano_b = 1121.8704833214867;
+    static final double q3_indicador_formacion_rec_humano_b = 682.4540781698629;
+    static final double q4_indicador_formacion_rec_humano_b = 353.1255090931072;
+    static final double min_indicador_formacion_rec_humano_b = 18.232155679395458;
     static final double max_indicador_cohesion = 4.93296089385474;
     static final double max_indicador_colaboracion = 9.5;
     
-    //Cálculo indicadores de cohesión y colaboración
+    static final double max_indicador_grupo = 5.626200827376895;
+    static final double q2_indicador_grupo = 1.1521845628075682;
+    static final double q3_indicador_grupo = 0.6545802307971662;
+    static final double q4_indicador_grupo = 0.3609370906856835;
+    static final double min_indicador_grupo = 0.02891673091277181;
+    
+    //Cï¿½lculo indicadores de cohesiï¿½n y colaboraciï¿½n
     public static double indicador_cohesion(double num_investigadores, double num_productos){
             return (num_investigadores/num_productos)-1;
     }
@@ -771,7 +801,7 @@ public class ConstantesModelo {
             return((num_grupos_colaboracion/num_productos)-1);
     }
     
-    //Cálculo de índices de producción de clase
+    //Cï¿½lculo de ï¿½ndices de producciï¿½n de clase
     public static double indice_top(double indicador_top){
     
             return(indicador_top/max_indicador_top);

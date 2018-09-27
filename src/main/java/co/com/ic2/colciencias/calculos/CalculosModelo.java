@@ -1,26 +1,25 @@
 package co.com.ic2.colciencias.calculos;
 
-import java.util.List;
+import java.util.Calendar;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class TestCalculos {
+import co.com.ic2.colciencias.gruplac.ClasificacionGrupo;
+
+public class CalculosModelo {
 	
-	public String getClasificacionInformacion(String jsonProductosGrupo,
-			String jsonPerfilesColaboracion){
+	public static ClasificacionGrupo getClasificacion(String productos,String perfilesColaboracion,String anoFormacion) {
 		
-		return getClasificacion(jsonProductosGrupo,jsonPerfilesColaboracion);
-	}
-	
-	public static String getClasificacion(String productos,String perfilesColaboracion) {
+		ClasificacionGrupo clasificacion=new ClasificacionGrupo();
 		
 		JsonParser parser=new JsonParser();
 		JsonArray jsonProductos=parser.parse(productos).getAsJsonArray();
 		JsonArray jsonPerfilesColaboracion=parser.parse(perfilesColaboracion).getAsJsonArray();
-		System.out.println(jsonProductos.toString());
-		System.out.println(jsonPerfilesColaboracion.toString());
+		
+		Calendar cal= Calendar.getInstance();
+		int anosExistencia= cal.get(Calendar.YEAR)-Integer.parseInt(anoFormacion) ;
 		
 		//Productos TOP
         int num_art_a1=buscarProducto(jsonProductos,parser,"ART_A1");
@@ -33,7 +32,7 @@ public class TestCalculos {
         int num_pa2=buscarProducto(jsonProductos,parser,"PA2_MA2");
         int num_ma1=buscarProducto(jsonProductos,parser,"PA3_MA3");
         int num_ma2=buscarProducto(jsonProductos,parser,"PA4_MA4");
-        //Prductos A}
+        //Prductos A
         int num_art_b=buscarProducto(jsonProductos,parser,"ART_B");
         int num_art_c=buscarProducto(jsonProductos,parser,"ART_C");
         int num_lib_b=buscarProducto(jsonProductos,parser,"LIB_B");
@@ -123,47 +122,92 @@ public class TestCalculos {
                 num_di_b+num_eci_a+num_sf_a+num_sf_b+num_pp_a+num_pi_a+num_se+
                 num_ebt_a+num_ebt_b+num_ipp+num_con_ct+num_inf;
         
-        System.out.println("número productos "+num_productos);
-                //104;
+        clasificacion.setProductos(jsonProductos.toString());
         
         double indicador_top=ConstantesModelo.indicador_top(num_art_a1, num_art_a2, num_lib_a1, num_lib_a, num_cap_lib_a1, num_cap_lib_a, num_pa1, num_pa2, num_ma1, num_ma2);
-        
+        clasificacion.setIndicador_top(indicador_top);
         double indicador_a=ConstantesModelo.indicador_a(num_art_b, num_art_c, num_lib_b, num_cap_lib_b, num_pa3, num_pa4, num_ma3, num_ma4, num_di_a, num_eci_a, num_sf_a, num_pp_a, num_pi_a, num_sd, num_se, num_ebt_a);
-        
+        clasificacion.setIndicador_a(indicador_a);
         double indicador_b=ConstantesModelo.indicador_b(num_art_d, num_pb1, num_pb2, num_pb3, num_pb4, num_pb5, num_pc, num_mb1, num_mb2, num_mb3, num_mb4, num_mb5, num_mc, num_di_b, num_sf_b, num_ebt_b, num_ipp, num_con_ct, num_inf);
-        
+        clasificacion.setIndicador_b(indicador_b);
         double indicador_apropiacion_conocimiento=ConstantesModelo.indicador_apropiacion_conocimiento(num_ppc, num_epc, num_epa, num_pcc, num_gc, num_ec_a, num_ec_b, num_rc_a, num_rc_b, num_wp, num_bol, num_erl, num_ifi);
-        
+        clasificacion.setIndicador_apropiacion_conocimiento(indicador_apropiacion_conocimiento);
         double indicador_formacion_recurso_humano_a=ConstantesModelo.indicador_formacion_rec_humano_a(num_td_a, num_td_b, num_ap_a, num_ap_c);
-        
+        clasificacion.setIndicador_formacion_recurso_humano_a(indicador_formacion_recurso_humano_a);
         double indicador_formacion_recurso_humano_b=ConstantesModelo.indicador_formacion_rec_humano_b(num_tm_a, num_tm_b, num_tp_a, num_tp_b, num_pid_a, num_pid_b, num_pid_c, num_pic_a, num_pic_b, num_pic_c, num_pf_a, num_pf_b, num_pe, num_ap_b, num_ap_d, num_apo);
-        
+        clasificacion.setIndicador_formacion_recurso_humano_b(indicador_formacion_recurso_humano_b);
         double indicador_cohesion=ConstantesModelo.indicador_cohesion(num_investigadores, num_productos);
-        
+        clasificacion.setIndicador_cohesion(indicador_cohesion);
         double indicador_colaboracion=ConstantesModelo.indicador_colaboracion(num_grupos_investigacion, num_productos);
+        clasificacion.setIndicador_colaboracion(indicador_colaboracion);
         
         double indice_top=ConstantesModelo.indice_top(indicador_top);
-        System.out.println("indice_top "+indice_top);
+        clasificacion.setIndice_top(indice_top);
         double indice_a=ConstantesModelo.indice_a(indicador_a);
-        System.out.println("indice_a "+indice_a);
+        clasificacion.setIndice_a(indice_a);
         double indice_b=ConstantesModelo.indice_b(indicador_b);
-        System.out.println("indice_b "+indice_b);
+        clasificacion.setIndice_b(indice_b);
         double indice_apropiacion_conocimiento=ConstantesModelo.indice_apropiacion_conocimiento(indicador_apropiacion_conocimiento);
-        System.out.println("indice_apropiacion_conocimiento "+indice_apropiacion_conocimiento);
+        clasificacion.setIndice_apropiacion_conocimiento(indice_apropiacion_conocimiento);
         double indice_formacion_recurso_humano_a=ConstantesModelo.indice_formacion_rec_humano_a(indicador_formacion_recurso_humano_a);
-        System.out.println("indice_formacion_recurso_humano_a "+indice_formacion_recurso_humano_a);
+        clasificacion.setIndice_formacion_recurso_humano_a(indice_formacion_recurso_humano_a);
         double indice_formacion_recurso_humano_b=ConstantesModelo.indice_formacion_rec_humano_b(indicador_formacion_recurso_humano_b);
-        System.out.println("indice_formacion_recurso_humano_b "+indice_formacion_recurso_humano_b);
+        clasificacion.setIndice_formacion_recurso_humano_b(indice_formacion_recurso_humano_b);
         double indice_cohesion=ConstantesModelo.indice_cohesion(indicador_cohesion);
-        System.out.println("indice_cohesion "+indice_cohesion);
+        clasificacion.setIndice_cohesion(indice_cohesion);
         double indice_colaboracion=ConstantesModelo.indice_colaboracion(indicador_colaboracion);
-        System.out.println("indice_colaboracion "+indice_colaboracion);
+        clasificacion.setIndice_colaboracion(indice_colaboracion);
         double indicador_grupo=ConstantesModelo.indicador_grupo(indice_top, indice_a, indice_b, indice_apropiacion_conocimiento, indice_formacion_recurso_humano_a, indice_formacion_recurso_humano_b, indice_cohesion, indice_colaboracion);
+        clasificacion.setIndicador_grupo(indicador_grupo);
+        clasificacion.setAnos_existencia(anosExistencia);
+        clasificacion.setClasificacion_grupo(clasificarGrupo(clasificacion));
         
-        System.out.println("indicador_grupo "+indicador_grupo);
-        
-		return null;
+		return clasificacion;
 	}
+	private static String clasificarGrupo(ClasificacionGrupo clasificacion) {
+		if(clasificacion.getIndicador_grupo()>=ConstantesModelo.q2_indicador_grupo &&
+			clasificacion.getIndicador_top()>=ConstantesModelo.q2_indicador_top &&
+			clasificacion.getIndicador_apropiacion_conocimiento()>0 &&
+			clasificacion.getIndicador_formacion_recurso_humano_a()>0 &&
+			clasificacion.getIndicador_cohesion()>0 &&
+			clasificacion.getAnos_existencia()>=5){
+			
+			return "A1";
+		}
+		if(clasificacion.getIndicador_grupo()>=ConstantesModelo.q3_indicador_grupo &&
+			(clasificacion.getIndicador_top()>0 || clasificacion.getIndicador_a()>0)&&
+			clasificacion.getIndicador_apropiacion_conocimiento()>0 &&
+			clasificacion.getIndicador_formacion_recurso_humano_a()>0 &&
+			clasificacion.getIndicador_cohesion()>0 &&
+			clasificacion.getAnos_existencia()>=5){
+			
+			return "A";
+		}
+		else if(clasificacion.getIndicador_grupo()>=ConstantesModelo.q4_indicador_grupo &&
+			(clasificacion.getIndicador_top()>0 ||clasificacion.getIndicador_a()>0)&&
+			clasificacion.getIndicador_apropiacion_conocimiento()>0 &&
+			(clasificacion.getIndicador_formacion_recurso_humano_a()>0 || 
+					clasificacion.getIndicador_formacion_recurso_humano_b()>=ConstantesModelo.q3_indicador_formacion_rec_humano_b) &&
+			clasificacion.getIndicador_cohesion()>0 &&
+			clasificacion.getAnos_existencia()>=3){
+			
+			return "B";
+		}
+		else if(clasificacion.getIndicador_grupo()>0 &&
+				(clasificacion.getIndicador_top()>0 || clasificacion.getIndicador_a()>0) &&
+			clasificacion.getIndicador_apropiacion_conocimiento()>0 &&
+			(clasificacion.getIndicador_formacion_recurso_humano_a()>0 ||
+					clasificacion.getIndicador_formacion_recurso_humano_b()>0) &&
+			clasificacion.getIndicador_cohesion()>0 &&
+			clasificacion.getAnos_existencia()>=2){
+			
+			return "C";
+		}
+		else {
+			return "Reconocido";
+		}
+	}	
+	
 	private static int buscarProducto(JsonArray array,JsonParser parser, String tipo){
 		for (int i=0;i<array.size();i++){
 			if(!array.get(i).toString().equals("null")){
