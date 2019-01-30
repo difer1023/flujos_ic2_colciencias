@@ -162,6 +162,8 @@ public class CalculosModelo {
         clasificacion.setAnos_existencia(anosExistencia);
         clasificacion.setClasificacion_grupo(clasificarGrupo(clasificacion));
         
+        clasificacion.setAno_creacion(Integer.parseInt(anoFormacion));
+        
 		return clasificacion;
 	}
 	private static String clasificarGrupo(ClasificacionGrupo clasificacion) {

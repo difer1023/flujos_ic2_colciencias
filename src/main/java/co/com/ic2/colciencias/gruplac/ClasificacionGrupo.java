@@ -55,6 +55,8 @@ public class ClasificacionGrupo {
 	@XmlElement(name = "anos_existencia")
     private int anos_existencia;
 	
+	@XmlElement(name = "ano_creacion")
+    private int ano_creacion;
 	
 	public String getProductos() {
 		return productos;
@@ -175,6 +177,12 @@ public class ClasificacionGrupo {
 	}
 	public void setAnos_existencia(int anos_existencia) {
 		this.anos_existencia = anos_existencia;
+	}
+	public int getAno_creacion() {
+		return ano_creacion;
+	}
+	public void setAno_creacion(int ano_creacion) {
+		this.ano_creacion = ano_creacion;
 	}
 	
 	

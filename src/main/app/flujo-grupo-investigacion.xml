@@ -49,9 +49,10 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where apf.i_cod_grupo_investigacion=#[codigoGrupo] 
 								and apf.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_AP})-1)] and #[anoFinVentanaObservacion]
 								and apf.c_categoria is not null
-								and apf.k_codigo not in (SELECT t1.k_codigo FROM apoyo_prog_f t1
-									INNER JOIN apoyo_prog_f t2 
+								and apf.k_codigo not in (SELECT t1.k_codigo FROM (select k_codigo,n_nombre from apoyo_prog_f where i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select k_codigo,n_nombre from apoyo_prog_f where i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by apf.k_codigo
 								
 								UNION ALL
 								
@@ -62,8 +63,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								and a.c_categoria not like "ART_D"
 								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_ART})-1)] and #[anoFinVentanaObservacion]
 								and a.c_categoria is not null
-								and a.k_codigo not in (SELECT t1.k_codigo FROM articulo t1
-									INNER JOIN articulo t2 
+								and a.k_codigo not in (SELECT t1.k_codigo FROM (select a.k_codigo,a.n_titulo from articulo a, articulo_autor au where a.k_codigo=au.i_cod_articulo and au.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select a.k_codigo,a.n_titulo from articulo a, articulo_autor au where a.k_codigo=au.i_cod_articulo and au.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by a.k_codigo
 								
@@ -75,8 +76,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								and au.i_cod_grupo_investigacion=#[codigoGrupo]
 								and a.c_categoria like "ART_D"
 								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_ART_D})-1)] and #[anoFinVentanaObservacion]
-								and a.k_codigo not in (SELECT t1.k_codigo FROM articulo t1
-									INNER JOIN articulo t2 
+								and a.k_codigo not in (SELECT t1.k_codigo FROM (select a.k_codigo,a.n_titulo from articulo a, articulo_autor au where a.k_codigo=au.i_cod_articulo and au.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select a.k_codigo,a.n_titulo from articulo a, articulo_autor au where a.k_codigo=au.i_cod_articulo and au.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by a.k_codigo
 								
@@ -87,9 +88,9 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where b.k_codigo=bau.i_cod_boletin
 								and bau.i_cod_grupo_investigacion=#[codigoGrupo]
 								and b.i_ano_elaboracion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_BOL})-1)] and #[anoFinVentanaObservacion]
-								and b.k_codigo not in (SELECT t1.k_codigo FROM boletin t1
-									INNER JOIN boletin t2 
-									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								and b.k_codigo not in ((SELECT t1.k_codigo FROM (select b.k_codigo,b.n_titulo from boletin b, boletin_autor ba where b.k_codigo=ba.i_cod_boletin and ba.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select b.k_codigo,b.n_titulo from boletin b, boletin_autor ba where b.k_codigo=ba.i_cod_boletin and ba.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo))
 								group by b.k_codigo
 								
 								UNION ALL
@@ -99,8 +100,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where cli.k_codigo=cla.i_cod_cap_libro
 								and cla.i_cod_grupo_investigacion=#[codigoGrupo]
 								and cli.i_ano_publicacion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_CAP_LIB})-1)] and #[anoFinVentanaObservacion]
-								and cli.k_codigo not in (SELECT t1.k_codigo FROM cap_libro_investigacion t1
-									INNER JOIN cap_libro_investigacion t2 
+								and cli.k_codigo not in (SELECT t1.k_codigo FROM (select cl.k_codigo,cl.n_titulo_cap from cap_libro_investigacion cl, cap_libro_autor cla where cl.k_codigo=cla.i_cod_cap_libro and cla.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select cl.k_codigo,cl.n_titulo_cap from cap_libro_investigacion cl, cap_libro_autor cla where cl.k_codigo=cla.i_cod_cap_libro and cla.i_cod_grupo_investigacion=#[codigoGrupo]) as t2
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo_cap = t2.n_titulo_cap)
 								group by cli.k_codigo
 								
@@ -112,8 +113,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where c.k_codigo=ca.i_cod_consultoria
 								and ca.i_cod_grupo_investigacion=#[codigoGrupo]
 								and c.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_CON_CT})-1)] and #[anoFinVentanaObservacion]
-								and c.k_codigo not in (SELECT t1.k_codigo FROM consultoria t1
-									INNER JOIN consultoria t2 
+								and c.k_codigo not in (SELECT t1.k_codigo FROM (select c.k_codigo,c.n_titulo from consultoria c, consultoria_autor ca where c.k_codigo=ca.i_cod_consultoria and ca.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select c.k_codigo,c.n_titulo from consultoria c, consultoria_autor ca where c.k_codigo=ca.i_cod_consultoria and ca.i_cod_grupo_investigacion=#[codigoGrupo]) as t2
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by c.k_codigo
 								
@@ -124,8 +125,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where di.k_codigo=dit.i_cod_diseno_industrial
 								and dit.i_cod_grupo_investigacion=#[codigoGrupo]
 								and di.i_ano_obtencion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_DI})-1)] and #[anoFinVentanaObservacion]
-								and di.k_codigo not in (SELECT t1.k_codigo FROM diseno_industrial t1
-									INNER JOIN diseno_industrial t2 
+								and di.k_codigo not in (SELECT t1.k_codigo FROM (select di.k_codigo,di.n_titulo_reg from diseno_industrial di, diseno_industrial_titular dit where di.k_codigo=dit.i_cod_diseno_industrial and dit.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select di.k_codigo,di.n_titulo_reg from diseno_industrial di, diseno_industrial_titular dit where di.k_codigo=dit.i_cod_diseno_industrial and dit.i_cod_grupo_investigacion=#[codigoGrupo]) as t2
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo_reg = t2.n_titulo_reg)
 								group by di.k_codigo
 								
@@ -136,8 +137,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where dt.k_codigo=dta.i_cod_doc_trabajo
 								and dta.i_cod_grupo_investigacion=#[codigoGrupo]
 								and dt.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_WP})-1)] and #[anoFinVentanaObservacion]
-								and dt.k_codigo not in (SELECT t1.k_codigo FROM doc_trabajo t1
-									INNER JOIN doc_trabajo t2 
+								and dt.k_codigo not in (SELECT t1.k_codigo FROM (select dt.k_codigo,dt.n_titulo from doc_trabajo dt, doc_trabajo_autor dta where dt.k_codigo=dta.i_cod_doc_trabajo and dta.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select dt.k_codigo,dt.n_titulo from doc_trabajo dt, doc_trabajo_autor dta where dt.k_codigo=dta.i_cod_doc_trabajo and dta.i_cod_grupo_investigacion=#[codigoGrupo]) as t2
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by dt.k_codigo
 								
@@ -147,9 +148,10 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								edicion
 								where i_cod_grupo_investigacion=#[codigoGrupo]
 								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_ERL})-1)] and #[anoFinVentanaObservacion]
-								and k_codigo not in (SELECT t1.k_codigo FROM edicion t1
-									INNER JOIN edicion t2 
+								and k_codigo not in (SELECT t1.k_codigo FROM (select k_codigo,n_titulo from edicion where i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select k_codigo,n_titulo from edicion where i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by k_codigo
 								
 								UNION ALL
 								
@@ -160,8 +162,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								and ebt.c_categoria is not null
 								and ebta.i_cod_grupo_investigacion=#[codigoGrupo]
 								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_EBT})-1)] and #[anoFinVentanaObservacion]
-								and ebt.k_codigo not in (SELECT t1.k_codigo FROM emp_base_tec t1
-									INNER JOIN emp_base_tec t2 
+								and ebt.k_codigo not in (SELECT t1.k_codigo FROM (select ebt.k_codigo,ebt.n_nombre from emp_base_tec ebt, emp_base_tec_autor ebta where ebt.k_codigo=ebta.i_cod_emp_base_tec and ebta.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select ebt.k_codigo,ebt.n_nombre from emp_base_tec ebt, emp_base_tec_autor ebta where ebt.k_codigo=ebta.i_cod_emp_base_tec and ebta.i_cod_grupo_investigacion=#[codigoGrupo]) as t2
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
 								group by ebt.k_codigo
 								
@@ -172,8 +174,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where epc.k_codigo=epca.i_cod_espacio_part_proyecto_CTI
 								and epca.i_cod_grupo_investigacion=#[codigoGrupo]
 								and epc.i_ano_inicio between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_EPC})-1)] and #[anoFinVentanaObservacion]
-								and epc.k_codigo not in (SELECT t1.k_codigo FROM espacio_part_proyecto_CTI t1
-									INNER JOIN espacio_part_proyecto_CTI t2 
+								and epc.k_codigo not in (SELECT t1.k_codigo FROM (select epc.k_codigo,epc.n_nombre_espacio from espacio_part_proyecto_CTI epc, espacio_part_proyecto_CTI_autor epca where epc.k_codigo=epca.i_cod_espacio_part_proyecto_CTI and epca.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select epc.k_codigo,epc.n_nombre_espacio from espacio_part_proyecto_CTI epc, espacio_part_proyecto_CTI_autor epca where epc.k_codigo=epca.i_cod_espacio_part_proyecto_CTI and epca.i_cod_grupo_investigacion=#[codigoGrupo]) as t2
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre_espacio = t2.n_nombre_espacio)
 								group by epc.k_codigo
 								
@@ -184,8 +186,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where ec.k_codigo=ect.i_cod_esq_circuito
 								and ect.i_cod_grupo_investigacion=#[codigoGrupo]
 								and ec.i_ano_obtencion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_ECI})-1)] and #[anoFinVentanaObservacion]
-								and ec.k_codigo not in (SELECT t1.k_codigo FROM esq_circuito t1
-									INNER JOIN esq_circuito t2 
+								and ec.k_codigo not in (SELECT t1.k_codigo FROM (select ec.k_codigo,ec.n_titulo_registro from esq_circuito ec, esq_circuito_titular ect where ec.k_codigo=ect.i_cod_esq_circuito and ect.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select ec.k_codigo,ec.n_titulo_registro from esq_circuito ec, esq_circuito_titular ect where ec.k_codigo=ect.i_cod_esq_circuito and ect.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo_registro = t2.n_titulo_registro)
 								group by ec.k_codigo
 								
@@ -196,8 +198,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where ecc.k_codigo=ecci.i_cod_est_comunicacion_conocimiento
 								and ecci.i_cod_grupo_investigacion=#[codigoGrupo]
 								and ecc.i_ano_inicio between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PCC})-1)] and #[anoFinVentanaObservacion]
-								and ecc.k_codigo not in (SELECT t1.k_codigo FROM est_comunicacion_conocimiento t1
-									INNER JOIN est_comunicacion_conocimiento t2 
+								and ecc.k_codigo not in (SELECT t1.k_codigo FROM (select ecc.k_codigo,ecc.n_nombre from est_comunicacion_conocimiento ecc, est_comunicacion_conocimiento_investigador ecci where ecc.k_codigo=ecci.i_cod_est_comunicacion_conocimiento and ecci.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select ecc.k_codigo,ecc.n_nombre from est_comunicacion_conocimiento ecc, est_comunicacion_conocimiento_investigador ecci where ecc.k_codigo=ecci.i_cod_est_comunicacion_conocimiento and ecci.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
 								group by ecc.k_codigo
 								
@@ -207,9 +209,10 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								est_fomento_CTI
 								where i_cod_grupo_investigacion=#[codigoGrupo]
 								and i_ano_inicio between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_EPA})-1)] and #[anoFinVentanaObservacion]
-								and k_codigo not in (SELECT t1.k_codigo FROM est_fomento_CTI t1
-									INNER JOIN est_fomento_CTI t2 
+								and k_codigo not in (SELECT t1.k_codigo FROM (select k_codigo,n_nombre from est_fomento_CTI where i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select k_codigo,n_nombre from est_fomento_CTI where i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by k_codigo
 								
 								UNION ALL
 								
@@ -219,8 +222,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								and eci.i_cod_evento_cientifico=ec.k_codigo
 								and eci.c_categoria is not null
 								and ec.i_ano_inicio between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_EC})-1)] and #[anoFinVentanaObservacion]
-								and ec.k_codigo not in (SELECT t1.k_codigo FROM evento_cientifico t1
-									INNER JOIN evento_cientifico t2 
+								and ec.k_codigo not in (SELECT t1.k_codigo FROM (select ec.k_codigo,ec.n_nombre from evento_cientifico ec, evento_cientifico_investigador eci where ec.k_codigo=eci.i_cod_evento_cientifico and eci.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select ec.k_codigo,ec.n_nombre from evento_cientifico ec, evento_cientifico_investigador eci where ec.k_codigo=eci.i_cod_evento_cientifico and eci.i_cod_grupo_investigacion=#[codigoGrupo]) as t2  
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
 								
 								UNION ALL
@@ -230,8 +233,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where gci.k_codigo=gcia.i_cod_gen_contenido
 								and gcia.i_cod_grupo_investigacion=#[codigoGrupo]
 								and gci.i_ano_publicacion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_GC})-1)] and #[anoFinVentanaObservacion]
-								and gci.k_codigo not in (SELECT t1.k_codigo FROM gen_cont_impreso t1
-									INNER JOIN gen_cont_impreso t2 
+								and gci.k_codigo not in (SELECT t1.k_codigo FROM (select gci.k_codigo,gci.n_titulo from gen_cont_impreso gci, gen_cont_impreso_autor gcia where gci.k_codigo=gcia.i_cod_gen_contenido and gcia.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select gci.k_codigo,gci.n_titulo from gen_cont_impreso gci, gen_cont_impreso_autor gcia where gci.k_codigo=gcia.i_cod_gen_contenido and gcia.i_cod_grupo_investigacion=#[codigoGrupo]) as t2   
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by gci.k_codigo
 								
@@ -242,8 +245,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where gcm.k_codigo=gcmp.i_cod_gen_cont_multimedia
 								and gcmp.i_cod_grupo_investigacion=#[codigoGrupo]
 								and gcm.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_GC})-1)] and #[anoFinVentanaObservacion]
-								and gcm.k_codigo not in (SELECT t1.k_codigo FROM gen_cont_multimedia t1
-									INNER JOIN gen_cont_multimedia t2 
+								and gcm.k_codigo not in (SELECT t1.k_codigo FROM (select gcm.k_codigo,gcm.n_titulo from gen_cont_multimedia gcm, gen_cont_multimedia_participante gcmp where gcm.k_codigo=gcmp.i_cod_gen_cont_multimedia and gcmp.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select gcm.k_codigo,gcm.n_titulo from gen_cont_multimedia gcm, gen_cont_multimedia_participante gcmp where gcm.k_codigo=gcmp.i_cod_gen_cont_multimedia and gcmp.i_cod_grupo_investigacion=#[codigoGrupo]) as t2   
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by gcm.k_codigo
 								
@@ -254,8 +257,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where gcv.k_codigo=gcva.i_cod_gen_cont_virtual
 								and gcva.i_cod_grupo_investigacion=#[codigoGrupo]
 								and gcv.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_GC})-1)] and #[anoFinVentanaObservacion]
-								and gcv.k_codigo not in (SELECT t1.k_codigo FROM gen_cont_virtual t1
-									INNER JOIN gen_cont_virtual t2 
+								and gcv.k_codigo not in (SELECT t1.k_codigo FROM (select gcv.k_codigo,gcv.n_titulo from gen_cont_virtual gcv, gen_cont_virtual_autor gcva where gcv.k_codigo=gcva.i_cod_gen_cont_virtual and gcva.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select gcv.k_codigo,gcv.n_titulo from gen_cont_virtual gcv, gen_cont_virtual_autor gcva where gcv.k_codigo=gcva.i_cod_gen_cont_virtual and gcva.i_cod_grupo_investigacion=#[codigoGrupo]) as t2   
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by gcv.k_codigo
 								
@@ -266,8 +269,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where ifi.k_codigo=ifia.i_cod_informe_final
 								and ifia.i_cod_grupo_investigacion=#[codigoGrupo]
 								and ifi.i_ano_elaboracion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_IFI})-1)] and #[anoFinVentanaObservacion]
-								and ifi.k_codigo not in (SELECT t1.k_codigo FROM informe_final t1
-									INNER JOIN informe_final t2 
+								and ifi.k_codigo not in (SELECT t1.k_codigo FROM (select ifi.k_codigo,ifi.n_titulo from informe_final ifi, informe_final_autor ifia where ifi.k_codigo=ifia.i_cod_informe_final and ifia.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select ifi.k_codigo,ifi.n_titulo from informe_final ifi, informe_final_autor ifia where ifi.k_codigo=ifia.i_cod_informe_final and ifia.i_cod_grupo_investigacion=#[codigoGrupo]) as t2   
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by ifi.k_codigo
 								
@@ -278,8 +281,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where it.k_codigo=ita.i_cod_informe
 								and ita.i_cod_grupo_investigacion=#[codigoGrupo]
 								and it.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_INF})-1)] and #[anoFinVentanaObservacion]
-								and it.k_codigo not in (SELECT t1.k_codigo FROM informe_tec t1
-									INNER JOIN informe_tec t2 
+								and it.k_codigo not in (SELECT t1.k_codigo FROM (select it.k_codigo,it.n_titulo from informe_tec it, informe_tec_autor ita where it.k_codigo=ita.i_cod_informe and ita.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select it.k_codigo,it.n_titulo from informe_tec it, informe_tec_autor ita where it.k_codigo=ita.i_cod_informe and ita.i_cod_grupo_investigacion=#[codigoGrupo]) as t2   
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by it.k_codigo
 								
@@ -290,8 +293,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where ip.k_codigo=ipa.i_cod_innovacion_ps
 								and ipa.i_cod_grupo_investigacion=#[codigoGrupo]
 								and ip.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_IPP})-1)] and #[anoFinVentanaObservacion]
-								and ip.k_codigo not in (SELECT t1.k_codigo FROM innovacion_ps t1
-									INNER JOIN innovacion_ps t2 
+								and ip.k_codigo not in (SELECT t1.k_codigo FROM (select ip.k_codigo,ip.n_nombre from innovacion_ps ip, innovacion_ps_autor ipa where ip.k_codigo=ipa.i_cod_innovacion_ps and ipa.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select ip.k_codigo,ip.n_nombre from innovacion_ps ip, innovacion_ps_autor ipa where ip.k_codigo=ipa.i_cod_innovacion_ps and ipa.i_cod_grupo_investigacion=#[codigoGrupo]) as t2   
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
 								group by ip.k_codigo
 								
@@ -302,9 +305,9 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where li.k_codigo=la.i_cod_libro
 								and la.i_cod_grupo_investigacion=#[codigoGrupo]
 								and li.i_ano_publicacion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_LIB})-1)] and #[anoFinVentanaObservacion]
-								#and li.k_codigo not in (SELECT t1.k_codigo FROM libro_investigacion t1
-									#		INNER JOIN libro_investigacion t2 
-									#		WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								and li.k_codigo not in (SELECT t1.k_codigo FROM (select li.k_codigo,l.n_titulo from libro_investigacion li, libro_autor la,libro l where li.k_codigo=la.i_cod_libro and l.k_ISBN=li.c_ISBN_libro and la.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select li.k_codigo,l.n_titulo from libro_investigacion li, libro_autor la,libro l where li.k_codigo=la.i_cod_libro and l.k_ISBN=li.c_ISBN_libro and la.i_cod_grupo_investigacion=#[codigoGrupo]) as t2   
+											WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by li.k_codigo
 								
 								UNION ALL
@@ -313,9 +316,10 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								part_ciud_proyecto_CTI
 								where i_cod_grupo_investigacion=#[codigoGrupo]
 								and i_ano_inicio between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PPC})-1)] and #[anoFinVentanaObservacion]
-								and k_codigo not in (SELECT t1.k_codigo FROM part_ciud_proyecto_CTI t1
-									INNER JOIN part_ciud_proyecto_CTI t2 
+								and k_codigo not in (SELECT t1.k_codigo FROM (select k_codigo,n_titulo from part_ciud_proyecto_CTI where i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select k_codigo,n_titulo from part_ciud_proyecto_CTI where i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								group by k_codigo
 								
 								UNION ALL
 								
@@ -324,6 +328,9 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where p.k_codigo=pg.i_cod_patente
 								and pg.i_cod_grupo_investigacion=#[codigoGrupo]
 								and p.i_ano_obtencion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PA})-1)] and #[anoFinVentanaObservacion]
+								and k_codigo not in (SELECT t1.k_codigo FROM (select p.k_codigo,p.n_numero_patente from patente p, patente_grupo_inv pg where p.k_codigo=pg.i_cod_patente and pg.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select p.k_codigo,p.n_numero_patente from patente p, patente_grupo_inv pg where p.k_codigo=pg.i_cod_patente and pg.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
+									WHERE t1.k_codigo > t2.k_codigo AND t1.n_numero_patente = t2.n_numero_patente)
 								group by p.k_codigo
 								
 								UNION ALL
@@ -333,8 +340,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where pp.k_codigo=ppa.i_cod_planta_piloto
 								and ppa.i_cod_grupo_investigacion=#[codigoGrupo]
 								and pp.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PP})-1)] and #[anoFinVentanaObservacion]
-								and pp.k_codigo not in (SELECT t1.k_codigo FROM planta_piloto t1
-									INNER JOIN planta_piloto t2 
+								and pp.k_codigo not in (SELECT t1.k_codigo FROM (select pp.k_codigo,pp.n_nombre from planta_piloto pp, planta_piloto_autor ppa where pp.k_codigo=ppa.i_cod_planta_piloto and ppa.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select pp.k_codigo,pp.n_nombre from planta_piloto pp, planta_piloto_autor ppa where pp.k_codigo=ppa.i_cod_planta_piloto and ppa.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
 								group by pp.k_codigo
 								
@@ -344,9 +351,10 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								programa_ondas
 								where i_cod_grupo_investigacion=#[codigoGrupo]
 								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_APO})-1)] and #[anoFinVentanaObservacion]
-								and k_codigo not in (SELECT t1.k_codigo FROM programa_ondas t1
-									INNER JOIN programa_ondas t2 
+								and k_codigo not in (SELECT t1.k_codigo FROM (select k_codigo,n_nombre from programa_ondas where i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select k_codigo,n_nombre from programa_ondas where i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by k_codigo
 								
 								UNION ALL
 								
@@ -355,8 +363,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where pi.k_codigo=pia.i_cod_prototipo_ind
 								and pia.i_cod_grupo_investigacion=#[codigoGrupo]
 								and pi.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PI})-1)] and #[anoFinVentanaObservacion]
-								and pi.k_codigo not in (SELECT t1.k_codigo FROM prototipo_ind t1
-									INNER JOIN prototipo_ind t2 
+								and pi.k_codigo not in (SELECT t1.k_codigo FROM (select pi.k_codigo,pi.n_nombre from prototipo_ind pi, prototipo_ind_autor pia where pi.k_codigo=pia.i_cod_prototipo_ind and pia.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select pi.k_codigo,pi.n_nombre from prototipo_ind pi, prototipo_ind_autor pia where pi.k_codigo=pia.i_cod_prototipo_ind and pia.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
 								group by pi.k_codigo
 								
@@ -368,8 +376,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								and pi.i_cod_grupo_investigacion=#[codigoGrupo]
 								and p.c_categoria like "PID%"
 								and p.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PID})-1)] and #[anoFinVentanaObservacion]
-								and p.k_codigo not in (SELECT t1.k_codigo FROM proyecto t1
-									INNER JOIN proyecto t2 
+								and p.k_codigo not in (SELECT t1.k_codigo FROM (select p.k_codigo,p.n_titulo from proyecto p, proyecto_investigador pi where p.k_codigo=pi.i_cod_proyecto and pi.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select p.k_codigo,p.n_titulo from proyecto p, proyecto_investigador pi where p.k_codigo=pi.i_cod_proyecto and pi.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by p.k_codigo
 								
@@ -381,8 +389,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								and pi.i_cod_grupo_investigacion=#[codigoGrupo]
 								and p.c_categoria like "PF%"
 								and p.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PF})-1)] and #[anoFinVentanaObservacion]
-								and p.k_codigo not in (SELECT t1.k_codigo FROM proyecto t1
-									INNER JOIN proyecto t2 
+								and p.k_codigo not in (SELECT t1.k_codigo FROM (select p.k_codigo,p.n_titulo from proyecto p, proyecto_investigador pi where p.k_codigo=pi.i_cod_proyecto and pi.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select p.k_codigo,p.n_titulo from proyecto p, proyecto_investigador pi where p.k_codigo=pi.i_cod_proyecto and pi.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by p.k_codigo
 								
@@ -394,8 +402,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								and pi.i_cod_grupo_investigacion=#[codigoGrupo]
 								and p.c_categoria like "PIC%"
 								and p.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PIC})-1)] and #[anoFinVentanaObservacion]
-								and p.k_codigo not in (SELECT t1.k_codigo FROM proyecto t1
-									INNER JOIN proyecto t2 
+								and p.k_codigo not in (SELECT t1.k_codigo FROM (select p.k_codigo,p.n_titulo from proyecto p, proyecto_investigador pi where p.k_codigo=pi.i_cod_proyecto and pi.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select p.k_codigo,p.n_titulo from proyecto p, proyecto_investigador pi where p.k_codigo=pi.i_cod_proyecto and pi.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by p.k_codigo
 								
@@ -406,8 +414,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where p.k_codigo=pi.i_cod_proyecto_ext
 								and pi.i_cod_grupo_investigacion=#[codigoGrupo]
 								and p.i_ano_inicio between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PE})-1)] and #[anoFinVentanaObservacion]
-								and p.k_codigo not in (SELECT t1.k_codigo FROM proyecto_ext_CTI t1
-									INNER JOIN proyecto_ext_CTI t2 
+								and p.k_codigo not in (SELECT t1.k_codigo FROM (select p.k_codigo,p.n_nombre from proyecto_ext_CTI p, proyecto_ext_CTI_investigador pi where p.k_codigo=pi.i_cod_proyecto_ext and pi.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select p.k_codigo,p.n_nombre from proyecto_ext_CTI p, proyecto_ext_CTI_investigador pi where p.k_codigo=pi.i_cod_proyecto_ext and pi.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
 								group by p.k_codigo
 								
@@ -417,9 +425,10 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								red_conocimiento
 								where i_cod_grupo_investigacion=#[codigoGrupo]
 								and i_ano_inicio between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_RC})-1)] and #[anoFinVentanaObservacion]
-								and k_codigo not in (SELECT t1.k_codigo FROM red_conocimiento t1
-									INNER JOIN red_conocimiento t2 
+								and k_codigo not in (SELECT t1.k_codigo FROM (select k_codigo,n_nombre from red_conocimiento where i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select k_codigo,n_nombre from red_conocimiento where i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
+								group by k_codigo
 								
 								UNION ALL
 								
@@ -428,8 +437,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where se.k_codigo=sea.i_cod_secreto_emp
 								and sea.i_cod_grupo_investigacion=#[codigoGrupo]
 								and se.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_SE})-1)] and #[anoFinVentanaObservacion]
-								and se.k_codigo not in (SELECT t1.k_codigo FROM secreto_emp t1
-									INNER JOIN secreto_emp t2 
+								and se.k_codigo not in (SELECT t1.k_codigo FROM (select se.k_codigo,se.n_nombre from secreto_emp se, secreto_emp_autor sea where se.k_codigo=sea.i_cod_secreto_emp and sea.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select se.k_codigo,se.n_nombre from secreto_emp se, secreto_emp_autor sea where se.k_codigo=sea.i_cod_secreto_emp and sea.i_cod_grupo_investigacion=#[codigoGrupo]) as t2  
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
 								group by se.k_codigo
 								
@@ -440,8 +449,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where sd.k_codigo=sdt.i_cod_signos_dis
 								and sdt.i_cod_grupo_investigacion=#[codigoGrupo]
 								and sd.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_SD})-1)] and #[anoFinVentanaObservacion]
-								and sd.k_codigo not in (SELECT t1.k_codigo FROM signos_dis t1
-									INNER JOIN signos_dis t2 
+								and sd.k_codigo not in (SELECT t1.k_codigo FROM (select sd.k_codigo,sd.n_titulo from signos_dis sd, signos_dis_titular sdt where sd.k_codigo=sdt.i_cod_signos_dis and sdt.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select sd.k_codigo,sd.n_titulo from signos_dis sd, signos_dis_titular sdt where sd.k_codigo=sdt.i_cod_signos_dis and sdt.i_cod_grupo_investigacion=#[codigoGrupo]) as t2  
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by sd.k_codigo
 								
@@ -452,8 +461,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where sf.k_codigo=sfa.i_cod_software
 								and sfa.i_cod_grupo_investigacion=#[codigoGrupo]
 								and sf.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_SF})-1)] and #[anoFinVentanaObservacion]
-								and sf.k_codigo not in (SELECT t1.k_codigo FROM software t1
-									INNER JOIN software t2 
+								and sf.k_codigo not in (SELECT t1.k_codigo FROM (select s.k_codigo,s.n_titulo from software s, software_autor sfa where s.k_codigo=sfa.i_cod_software and sfa.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select s.k_codigo,s.n_titulo from software s, software_autor sfa where s.k_codigo=sfa.i_cod_software and sfa.i_cod_grupo_investigacion=#[codigoGrupo]) as t2  
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by sf.k_codigo
 								
@@ -465,8 +474,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								and tga.i_cod_grupo_investigacion=#[codigoGrupo]
 								and tg.c_categoria like "TP%"
 								and tg.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_TP})-1)] and #[anoFinVentanaObservacion]
-								and tg.k_codigo not in (SELECT t1.k_codigo FROM trabajo_grado t1
-									INNER JOIN trabajo_grado t2 
+								and tg.k_codigo not in (SELECT t1.k_codigo FROM (select tg.k_codigo,tg.n_titulo from trabajo_grado tg, trabajo_grado_director tgd where tg.k_codigo=tgd.i_cod_trabajo_grado and tgd.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select tg.k_codigo,tg.n_titulo from trabajo_grado tg, trabajo_grado_director tgd where tg.k_codigo=tgd.i_cod_trabajo_grado and tgd.i_cod_grupo_investigacion=#[codigoGrupo]) as t2  
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by tg.k_codigo
 								
@@ -478,8 +487,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								and tga.i_cod_grupo_investigacion=#[codigoGrupo]
 								and tg.c_categoria like "TM%"
 								and tg.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_TM})-1)] and #[anoFinVentanaObservacion]
-								and tg.k_codigo not in (SELECT t1.k_codigo FROM trabajo_grado t1
-									INNER JOIN trabajo_grado t2 
+								and tg.k_codigo not in (SELECT t1.k_codigo FROM (select tg.k_codigo,tg.n_titulo from trabajo_grado tg, trabajo_grado_director tgd where tg.k_codigo=tgd.i_cod_trabajo_grado and tgd.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select tg.k_codigo,tg.n_titulo from trabajo_grado tg, trabajo_grado_director tgd where tg.k_codigo=tgd.i_cod_trabajo_grado and tgd.i_cod_grupo_investigacion=#[codigoGrupo]) as t2  
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by tg.k_codigo
 								
@@ -491,8 +500,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								and tga.i_cod_grupo_investigacion=#[codigoGrupo]
 								and tg.c_categoria like "TD%"
 								and tg.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_TP})-1)] and #[anoFinVentanaObservacion]
-								and tg.k_codigo not in (SELECT t1.k_codigo FROM trabajo_grado t1
-									INNER JOIN trabajo_grado t2 
+								and tg.k_codigo not in (SELECT t1.k_codigo FROM (select tg.k_codigo,tg.n_titulo from trabajo_grado tg, trabajo_grado_director tgd where tg.k_codigo=tgd.i_cod_trabajo_grado and tgd.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select tg.k_codigo,tg.n_titulo from trabajo_grado tg, trabajo_grado_director tgd where tg.k_codigo=tgd.i_cod_trabajo_grado and tgd.i_cod_grupo_investigacion=#[codigoGrupo]) as t2  
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by tg.k_codigo
 								
@@ -515,8 +524,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								and a.c_categoria not like "ART_D"
 								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_ART})-1)] and #[anoFinVentanaObservacion]
 								and a.c_categoria is not null
-								and a.k_codigo not in (SELECT t1.k_codigo FROM articulo t1
-									INNER JOIN articulo t2 
+								and a.k_codigo not in (SELECT t1.k_codigo FROM (select a.k_codigo,a.n_titulo from articulo a, articulo_autor au where a.k_codigo=au.i_cod_articulo and au.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select a.k_codigo,a.n_titulo from articulo a, articulo_autor au where a.k_codigo=au.i_cod_articulo and au.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by a.k_codigo
 								
@@ -528,8 +537,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								and au.i_cod_grupo_investigacion=#[codigoGrupo]
 								and a.c_categoria like "ART_D"
 								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_ART_D})-1)] and #[anoFinVentanaObservacion]
-								and a.k_codigo not in (SELECT t1.k_codigo FROM articulo t1
-									INNER JOIN articulo t2 
+								and a.k_codigo not in (SELECT t1.k_codigo FROM (select a.k_codigo,a.n_titulo from articulo a, articulo_autor au where a.k_codigo=au.i_cod_articulo and au.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select a.k_codigo,a.n_titulo from articulo a, articulo_autor au where a.k_codigo=au.i_cod_articulo and au.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by a.k_codigo
 								
@@ -541,8 +550,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where cli.k_codigo=cla.i_cod_cap_libro
 								and cla.i_cod_grupo_investigacion=#[codigoGrupo]
 								and cli.i_ano_publicacion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_CAP_LIB})-1)] and #[anoFinVentanaObservacion]
-								and cli.k_codigo not in (SELECT t1.k_codigo FROM cap_libro_investigacion t1
-									INNER JOIN cap_libro_investigacion t2 
+								and cli.k_codigo not in (SELECT t1.k_codigo FROM (select cl.k_codigo,cl.n_titulo_cap from cap_libro_investigacion cl, cap_libro_autor cla where cl.k_codigo=cla.i_cod_cap_libro and cla.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select cl.k_codigo,cl.n_titulo_cap from cap_libro_investigacion cl, cap_libro_autor cla where cl.k_codigo=cla.i_cod_cap_libro and cla.i_cod_grupo_investigacion=#[codigoGrupo]) as t2
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo_cap = t2.n_titulo_cap)
 								group by cli.k_codigo
 								
@@ -554,8 +563,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where c.k_codigo=ca.i_cod_consultoria
 								and ca.i_cod_grupo_investigacion=#[codigoGrupo]
 								and c.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_CON_CT})-1)] and #[anoFinVentanaObservacion]
-								and c.k_codigo not in (SELECT t1.k_codigo FROM consultoria t1
-									INNER JOIN consultoria t2 
+								and c.k_codigo not in (SELECT t1.k_codigo FROM (select c.k_codigo,c.n_titulo from consultoria c, consultoria_autor ca where c.k_codigo=ca.i_cod_consultoria and ca.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select c.k_codigo,c.n_titulo from consultoria c, consultoria_autor ca where c.k_codigo=ca.i_cod_consultoria and ca.i_cod_grupo_investigacion=#[codigoGrupo]) as t2
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by c.k_codigo
 								
@@ -566,8 +575,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where di.k_codigo=dit.i_cod_diseno_industrial
 								and dit.i_cod_grupo_investigacion=#[codigoGrupo]
 								and di.i_ano_obtencion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_DI})-1)] and #[anoFinVentanaObservacion]
-								and di.k_codigo not in (SELECT t1.k_codigo FROM diseno_industrial t1
-									INNER JOIN diseno_industrial t2 
+								and di.k_codigo not in (SELECT t1.k_codigo FROM (select di.k_codigo,di.n_titulo_reg from diseno_industrial di, diseno_industrial_titular dit where di.k_codigo=dit.i_cod_diseno_industrial and dit.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select di.k_codigo,di.n_titulo_reg from diseno_industrial di, diseno_industrial_titular dit where di.k_codigo=dit.i_cod_diseno_industrial and dit.i_cod_grupo_investigacion=#[codigoGrupo]) as t2
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo_reg = t2.n_titulo_reg)
 								group by di.k_codigo
 								
@@ -580,8 +589,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								and ebt.c_categoria is not null
 								and ebta.i_cod_grupo_investigacion=#[codigoGrupo]
 								and i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_EBT})-1)] and #[anoFinVentanaObservacion]
-								and ebt.k_codigo not in (SELECT t1.k_codigo FROM emp_base_tec t1
-									INNER JOIN emp_base_tec t2 
+								and ebt.k_codigo not in (SELECT t1.k_codigo FROM (select ebt.k_codigo,ebt.n_nombre from emp_base_tec ebt, emp_base_tec_autor ebta where ebt.k_codigo=ebta.i_cod_emp_base_tec and ebta.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select ebt.k_codigo,ebt.n_nombre from emp_base_tec ebt, emp_base_tec_autor ebta where ebt.k_codigo=ebta.i_cod_emp_base_tec and ebta.i_cod_grupo_investigacion=#[codigoGrupo]) as t2
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
 								group by ebt.k_codigo
 								
@@ -593,8 +602,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where ec.k_codigo=ect.i_cod_esq_circuito
 								and ect.i_cod_grupo_investigacion=#[codigoGrupo]
 								and ec.i_ano_obtencion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_ECI})-1)] and #[anoFinVentanaObservacion]
-								and ec.k_codigo not in (SELECT t1.k_codigo FROM esq_circuito t1
-									INNER JOIN esq_circuito t2 
+								and ec.k_codigo not in (SELECT t1.k_codigo FROM (select ec.k_codigo,ec.n_titulo_registro from esq_circuito ec, esq_circuito_titular ect where ec.k_codigo=ect.i_cod_esq_circuito and ect.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select ec.k_codigo,ec.n_titulo_registro from esq_circuito ec, esq_circuito_titular ect where ec.k_codigo=ect.i_cod_esq_circuito and ect.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo_registro = t2.n_titulo_registro)
 								group by ec.k_codigo
 								
@@ -606,8 +615,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where it.k_codigo=ita.i_cod_informe
 								and ita.i_cod_grupo_investigacion=#[codigoGrupo]
 								and it.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_INF})-1)] and #[anoFinVentanaObservacion]
-								and it.k_codigo not in (SELECT t1.k_codigo FROM informe_tec t1
-									INNER JOIN informe_tec t2 
+								and it.k_codigo not in (SELECT t1.k_codigo FROM (select it.k_codigo,it.n_titulo from informe_tec it, informe_tec_autor ita where it.k_codigo=ita.i_cod_informe and ita.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select it.k_codigo,it.n_titulo from informe_tec it, informe_tec_autor ita where it.k_codigo=ita.i_cod_informe and ita.i_cod_grupo_investigacion=#[codigoGrupo]) as t2   
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by it.k_codigo
 								
@@ -618,8 +627,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where ip.k_codigo=ipa.i_cod_innovacion_ps
 								and ipa.i_cod_grupo_investigacion=#[codigoGrupo]
 								and ip.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_IPP})-1)] and #[anoFinVentanaObservacion]
-								and ip.k_codigo not in (SELECT t1.k_codigo FROM innovacion_ps t1
-									INNER JOIN innovacion_ps t2 
+								and ip.k_codigo not in (SELECT t1.k_codigo FROM (select ip.k_codigo,ip.n_nombre from innovacion_ps ip, innovacion_ps_autor ipa where ip.k_codigo=ipa.i_cod_innovacion_ps and ipa.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select ip.k_codigo,ip.n_nombre from innovacion_ps ip, innovacion_ps_autor ipa where ip.k_codigo=ipa.i_cod_innovacion_ps and ipa.i_cod_grupo_investigacion=#[codigoGrupo]) as t2   
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
 								group by ip.k_codigo
 								
@@ -630,9 +639,9 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where li.k_codigo=la.i_cod_libro
 								and la.i_cod_grupo_investigacion=#[codigoGrupo]
 								and li.i_ano_publicacion between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_LIB})-1)] and #[anoFinVentanaObservacion]
-								#and li.k_codigo not in (SELECT t1.k_codigo FROM libro_investigacion t1
-									#		INNER JOIN libro_investigacion t2 
-									#		WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
+								and li.k_codigo not in (SELECT t1.k_codigo FROM (select li.k_codigo,l.n_titulo from libro_investigacion li, libro_autor la,libro l where li.k_codigo=la.i_cod_libro and l.k_ISBN=li.c_ISBN_libro and la.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select li.k_codigo,l.n_titulo from libro_investigacion li, libro_autor la,libro l where li.k_codigo=la.i_cod_libro and l.k_ISBN=li.c_ISBN_libro and la.i_cod_grupo_investigacion=#[codigoGrupo]) as t2   
+											WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by li.k_codigo
 								
 								UNION ALL
@@ -642,8 +651,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where pp.k_codigo=ppa.i_cod_planta_piloto
 								and ppa.i_cod_grupo_investigacion=#[codigoGrupo]
 								and pp.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PP})-1)] and #[anoFinVentanaObservacion]
-								and pp.k_codigo not in (SELECT t1.k_codigo FROM planta_piloto t1
-									INNER JOIN planta_piloto t2 
+								and pp.k_codigo not in (SELECT t1.k_codigo FROM (select pp.k_codigo,pp.n_nombre from planta_piloto pp, planta_piloto_autor ppa where pp.k_codigo=ppa.i_cod_planta_piloto and ppa.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select pp.k_codigo,pp.n_nombre from planta_piloto pp, planta_piloto_autor ppa where pp.k_codigo=ppa.i_cod_planta_piloto and ppa.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
 								group by pp.k_codigo
 								
@@ -654,8 +663,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where pi.k_codigo=pia.i_cod_prototipo_ind
 								and pia.i_cod_grupo_investigacion=#[codigoGrupo]
 								and pi.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_PI})-1)] and #[anoFinVentanaObservacion]
-								and pi.k_codigo not in (SELECT t1.k_codigo FROM prototipo_ind t1
-									INNER JOIN prototipo_ind t2 
+								and pi.k_codigo not in (SELECT t1.k_codigo FROM (select pi.k_codigo,pi.n_nombre from prototipo_ind pi, prototipo_ind_autor pia where pi.k_codigo=pia.i_cod_prototipo_ind and pia.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select pi.k_codigo,pi.n_nombre from prototipo_ind pi, prototipo_ind_autor pia where pi.k_codigo=pia.i_cod_prototipo_ind and pia.i_cod_grupo_investigacion=#[codigoGrupo]) as t2 
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
 								group by pi.k_codigo
 								
@@ -666,8 +675,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where se.k_codigo=sea.i_cod_secreto_emp
 								and sea.i_cod_grupo_investigacion=#[codigoGrupo]
 								and se.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_SE})-1)] and #[anoFinVentanaObservacion]
-								and se.k_codigo not in (SELECT t1.k_codigo FROM secreto_emp t1
-									INNER JOIN secreto_emp t2 
+								and se.k_codigo not in (SELECT t1.k_codigo FROM (select se.k_codigo,se.n_nombre from secreto_emp se, secreto_emp_autor sea where se.k_codigo=sea.i_cod_secreto_emp and sea.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select se.k_codigo,se.n_nombre from secreto_emp se, secreto_emp_autor sea where se.k_codigo=sea.i_cod_secreto_emp and sea.i_cod_grupo_investigacion=#[codigoGrupo]) as t2  
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_nombre = t2.n_nombre)
 								group by se.k_codigo
 								
@@ -678,8 +687,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where sd.k_codigo=sdt.i_cod_signos_dis
 								and sdt.i_cod_grupo_investigacion=#[codigoGrupo]
 								and sd.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_SD})-1)] and #[anoFinVentanaObservacion]
-								and sd.k_codigo not in (SELECT t1.k_codigo FROM signos_dis t1
-									INNER JOIN signos_dis t2 
+								and sd.k_codigo not in (SELECT t1.k_codigo FROM (select sd.k_codigo,sd.n_titulo from signos_dis sd, signos_dis_titular sdt where sd.k_codigo=sdt.i_cod_signos_dis and sdt.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select sd.k_codigo,sd.n_titulo from signos_dis sd, signos_dis_titular sdt where sd.k_codigo=sdt.i_cod_signos_dis and sdt.i_cod_grupo_investigacion=#[codigoGrupo]) as t2  
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by sd.k_codigo
 								
@@ -690,8 +699,8 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 								where sf.k_codigo=sfa.i_cod_software
 								and sfa.i_cod_grupo_investigacion=#[codigoGrupo]
 								and sf.i_ano between #[Integer.parseInt(anoFinVentanaObservacion)-(Integer.parseInt(${VO_SF})-1)] and #[anoFinVentanaObservacion]
-								and sf.k_codigo not in (SELECT t1.k_codigo FROM software t1
-									INNER JOIN software t2 
+								and sf.k_codigo not in (SELECT t1.k_codigo FROM (select s.k_codigo,s.n_titulo from software s, software_autor sfa where s.k_codigo=sfa.i_cod_software and sfa.i_cod_grupo_investigacion=#[codigoGrupo]) as t1
+									INNER JOIN (select s.k_codigo,s.n_titulo from software s, software_autor sfa where s.k_codigo=sfa.i_cod_software and sfa.i_cod_grupo_investigacion=#[codigoGrupo]) as t2  
 									WHERE t1.k_codigo > t2.k_codigo AND t1.n_titulo = t2.n_titulo)
 								group by sf.k_codigo
 								
@@ -781,15 +790,2735 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 			</when>
 			<when evaluator="groovy"
 				expression="message.getInvocationProperty('cxf_operation').getLocalPart() == 'insertarGrupoInvestigacion'">
-				<processor-chain doc:name="Processor Chain">
+				<processor-chain doc:name="insertarGrupoInvestigacion">
 					<set-session-variable variableName="grupoInvestigacion"
 						value="#[payload]" doc:name="Session Variable" />
 					<logger message="#[payload]" level="INFO" doc:name="Logger" />
-					<db:insert config-ref="MySQL_Configuration"
-						autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
-						doc:name="Database">
-						<db:parameterized-query><![CDATA[insert into grupo_investigacion (n_nombre,i_ano_creacion) values(#[grupoInvestigacion.nombre],#[grupoInvestigacion.anoMesFormacion])]]></db:parameterized-query>
-					</db:insert>
+                    <transactional action="ALWAYS_BEGIN" doc:name="Transactional">
+					
+					
+						
+						<db:insert config-ref="MySQL_Configuration"
+							autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+							doc:name="Database">
+							<db:parameterized-query><![CDATA[insert into grupo_investigacion (n_nombre,i_ano_creacion) values(#[grupoInvestigacion.nombre],#[grupoInvestigacion.anoMesFormacion])]]></db:parameterized-query>
+						</db:insert>
+						
+						<set-variable variableName="codigoGrupo"
+										value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+						
+						<logger message="id grupo #[codigoGrupo]" level="INFO" doc:name="Logger" />
+						<!-- investigador -->
+						<set-session-variable variableName="investigadores"
+						value="#[grupoInvestigacion.integrantes]" doc:name="Session Variable" />
+
+						<foreach collection="investigadores" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="investigador">
+	
+							<set-variable variableName="investigador" value="#[investigadores[i-1]]"
+								doc:name="Session Variable" />
+	
+							<db:select config-ref="MySQL_Configuration" doc:name="Database">
+								<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[investigador.nombreCompleto]]]></db:parameterized-query>
+							</db:select>
+	
+							<choice doc:name="Choice">
+								<when expression="#[payload.size() ==0]">
+									<logger message="no existe investigador" level="INFO"
+										doc:name="Logger" />
+										
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into investigador (n_nombre,c_categoria) values(#[investigador.nombreCompleto],(select k_codigo from categoria_investigador where n_nombre=#[investigador.categoria]))]]></db:parameterized-query>
+									</db:insert>
+	
+									<set-variable variableName="idInvestigador"
+										value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+								</when>
+								<otherwise>
+									<logger message="Investigador #[payload] ya existe"
+										level="INFO" doc:name="Logger" />
+	
+									<set-variable variableName="idInvestigador" value="#[payload[0].k_codigo]"
+										doc:name="Variable" />
+								</otherwise>
+							</choice>
+	
+							<logger message="#[idInvestigador]" level="INFO" doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into integrante_grupo (i_cod_grupo_investigacion,i_cod_investigador,b_lider_grupo,f_inicio_vinculacion,f_fin_vinculacion) values(#[codigoGrupo],#[idInvestigador],#[investigador.lider],#[investigador.inicioVinculacion],#[investigador.finVinculacion])]]></db:parameterized-query>
+							</db:insert>
+	
+						</foreach>
+						<!-- //investigador -->
+						<!-- apoyo a programa de formacion -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.apoyoProgramaFormacion != null]">
+								<set-session-variable variableName="apoyosProgramaFormacion"
+									value="#[grupoInvestigacion.apoyoProgramaFormacion]" doc:name="Session Variable" />
+			
+								<foreach collection="apoyosProgramaFormacion" doc:name="For Each"
+								counterVariableName="i" rootMessageVariableName="articulo">
+								<set-variable variableName="apoyoProgramaFormacion"
+									value="#[apoyosProgramaFormacion[i-1]]" doc:name="Session Variable" />
+								
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from entidad where n_nombre=#[apoyoProgramaFormacion.institucion]]]></db:parameterized-query>
+								</db:select>
+		
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+		
+								<choice doc:name="Choice">
+								
+									<when expression="#[apoyoProgramaFormacion.institucion == empty]">
+										<logger message="#[payload]" level="INFO" doc:name="Logger" />
+									</when>
+									<when expression="#[payload.size() ==0 ]">
+										<logger message="no existe institucion" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into entidad (n_nombre,b_institucion) values(#[apoyoProgramaFormacion.institucion],1)]]></db:parameterized-query>
+										</db:insert>
+		
+										<set-variable variableName="idInstitucion"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									
+									<otherwise>
+										<logger message="Entidad #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+		
+										<set-variable variableName="idInstitucion" value="#[payload[0].k_codigo]"
+											doc:name="Variable" />
+									</otherwise>
+								</choice>
+								
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into apoyo_prog_f (n_nombre,
+									i_institucion,n_facultad,n_departamento,
+									n_num_acto_admin,i_ano,i_tipo_apoyo,n_programa_seleccionado,
+									c_categoria,b_clasificado,i_cod_grupo_investigacion)
+									 values(#[apoyoProgramaFormacion.nombre],
+									 #[idInstitucion],#[apoyoProgramaFormacion.facultad],#[apoyoProgramaFormacion.departamento],
+									 #[apoyoProgramaFormacion.numActoAdmin],#[apoyoProgramaFormacion.ano],
+									 #[apoyoProgramaFormacion.tipoApoyo],#[apoyoProgramaFormacion.programaSeleccionado],
+									 #[apoyoProgramaFormacion.categoria],#[apoyoProgramaFormacion.clasificado],#[codigoGrupo])]]></db:parameterized-query>
+								</db:insert>
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+								<set-variable variableName="codigoApoyoPrograma"
+									value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+								<logger message="Codigo apoyo programa formacion generado #[codigoApoyoPrograma]"
+									level="INFO" doc:name="Logger" />
+									
+							</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene apoyosProgramaFormacion" />
+						    </otherwise>
+					    </choice>
+						<!-- // apoyo a programa de formacion -->
+						
+						<!-- articulos -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.articulosInvestigacion != null]">
+								<set-session-variable variableName="articulos"
+								value="#[grupoInvestigacion.articulosInvestigacion]" doc:name="Session Variable" />
+								<foreach collection="articulos" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="articulo">
+							<set-variable variableName="articulo" value="#[articulos[i-1]]"
+								doc:name="Session Variable" />
+							<logger message="#[articulos[i-1].nombre]" level="INFO"
+								doc:name="Logger" />
+							<logger message="#[articulo.nombre]" level="INFO" doc:name="Logger" />
+	
+							<db:select config-ref="MySQL_Configuration" doc:name="Database">
+								<db:parameterized-query><![CDATA[select k_ISSN from revista where k_ISSN=#[articulo.issn] and n_nombre=#[articulo.revista]]]></db:parameterized-query>
+							</db:select>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+							<choice doc:name="Choice">
+								<when expression="#[payload.size() ==0]">
+									<logger message="no existe issn" level="INFO" doc:name="Logger" />
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into revista (k_ISSN,n_nombre) values(#[articulo.issn],#[articulo.revista])]]></db:parameterized-query>
+									</db:insert>
+								</when>
+								<otherwise>
+									<logger message="ISSN #[articulo.issn] ya existe" level="INFO"
+										doc:name="Logger" />
+								</otherwise>
+							</choice>
+	
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into articulo (n_titulo,i_ano,i_mes,i_volumen,i_pagina_inicial,
+		                        i_pagina_final,i_ISSN_revista,c_pag_web,c_DOI,i_pais_publicacion,c_categoria,b_clasificado) values(#[articulo.nombre],#[articulo.ano],#[articulo.mes],#[articulo.volumen],#[articulo.pagInicial],#[articulo.pagFinal],#[articulo.issn],#[articulo.url],#[articulo.doi],(select k_codigo from pais where n_nombre=#[articulo.pais]),#[articulo.categoria],#[articulo.clasificado])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoArticulo"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger message="Codigo articulo generado #[codigoArticulo]"
+								level="INFO" doc:name="Logger" />
+	
+							<set-variable variableName="autores"
+								value="#[articulos[i-1].autores]" doc:name="Variable" />
+	
+							<foreach collection="autores" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="articulo">
+								<set-variable variableName="autor" value="#[autores[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[autor.nombreCompleto]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe investigador" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Investigador #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+	
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into articulo_autor (i_cod_articulo,i_cod_investigador,i_cod_grupo_investigacion,i_integrante_grupo,i_grupos_colaboracion) values(#[codigoArticulo],#[idAutor],#[codigoGrupo],#[autor.integranteGrupo],#[autor.gruposColaboracion])]]></db:parameterized-query>
+								</db:insert>
+							</foreach>
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene articulosInvestigacion" />
+						    </otherwise>
+					    </choice>	
+						<!-- //articulos -->
+						
+						<!-- asesoria programa ondas -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.asesoriaProgramaOndas != null]">
+								<set-session-variable variableName="asesoriasProgramaOndas"
+								value="#[grupoInvestigacion.asesoriaProgramaOndas]" doc:name="Session Variable" />
+		
+								<foreach collection="asesoriasProgramaOndas" doc:name="For Each"
+								counterVariableName="i" rootMessageVariableName="articulo">
+								<set-variable variableName="asesoriaProgramaOndas"
+									value="#[asesoriasProgramaOndas[i-1]]" doc:name="Session Variable" />
+		
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from entidad where n_nombre=#[asesoriaProgramaOndas.institucion]]]></db:parameterized-query>
+								</db:select>
+		
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+		
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe institucion" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into entidad (n_nombre,b_institucion) values(#[asesoriaProgramaOndas.institucion],1)]]></db:parameterized-query>
+										</db:insert>
+		
+										<set-variable variableName="idInstitucion"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Entidad #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+		
+										<set-variable variableName="idInstitucion" value="#[payload[0].k_codigo]"
+											doc:name="Variable" />
+									</otherwise>
+								</choice>
+		
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into programa_ondas (n_nombre,b_registro_BD,i_institucion,i_municipio,i_departamento,b_resultados,b_reconocido,b_participacion_ferias,c_categoria,b_clasificado)
+									 values(#[asesoriaProgramaOndas.nombre],#[asesoriaProgramaOndas.registroBD],#[idInstitucion],(select k_codigo from municipio where n_nombre=#[asesoriaProgramaOndas.municipio]),(select k_codigo from departamento where n_nombre=#[asesoriaProgramaOndas.departamento]),#[asesoriaProgramaOndas.resultados],#[asesoriaProgramaOndas.reconocido],#[asesoriaProgramaOndas.participacion],#[asesoriaProgramaOndas.categoria],#[asesoriaProgramaOndas.clasificado])]]></db:parameterized-query>
+								</db:insert>
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+								<set-variable variableName="codigoProgramaOndas"
+									value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+								<logger
+									message="Codigo programa ondas generado #[codigoProgramaOndas]"
+									level="INFO" doc:name="Logger" />
+		
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into programa_ondas_grupo (i_cod_programa_ondas,i_cod_grupo_investigacion)
+									 values(#[codigoProgramaOndas],#[codigoGrupo])]]></db:parameterized-query>
+								</db:insert>
+		
+							</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene asesoriasProgramaOndas" />
+						    </otherwise>
+					    </choice>
+						<!-- //asesoria programa ondas -->
+						
+						<!-- boletin -->
+						<!-- //boletin -->
+						
+						<!-- capitulo libro -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.capituloDeLibro != null]">
+								<set-session-variable variableName="capitulosLibro"
+								value="#[grupoInvestigacion.capituloDeLibro]" doc:name="Session Variable" />
+								<foreach collection="capitulosLibro" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="capituloLibro">
+							<set-variable variableName="capituloLibro" value="#[capitulosLibro[i-1]]"
+								doc:name="Session Variable" />
+	
+							<!-- Verificacion de Libro -->
+	
+							<db:select config-ref="MySQL_Configuration" doc:name="Database">
+								<db:parameterized-query><![CDATA[select k_ISBN from libro where k_ISBN=#[capituloLibro.isbn] and n_titulo=#[capituloLibro.tituloLibro]]]></db:parameterized-query>
+							</db:select>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+							<choice doc:name="Choice">
+								<when expression="#[payload.size() ==0]">
+									<logger message="no existe isbn" level="INFO" doc:name="Logger" />
+	
+									<!-- Verificacion de Editorial -->
+	
+									<db:select config-ref="MySQL_Configuration" doc:name="Database">
+										<db:parameterized-query><![CDATA[select k_codigo from editorial where n_nombre=#[capituloLibro.editorial]]]></db:parameterized-query>
+									</db:select>
+									<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+									<choice doc:name="Choice">
+										<when expression="#[payload.size() ==0]">
+											<logger message="no existe editorial" level="INFO"
+												doc:name="Logger" />
+											<db:insert config-ref="MySQL_Configuration"
+												autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+												doc:name="Database">
+												<db:parameterized-query><![CDATA[insert into editorial (n_nombre) values(#[capituloLibro.editorial])]]></db:parameterized-query>
+											</db:insert>
+	
+											<set-variable variableName="idEditorial"
+												value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+	
+										</when>
+										<otherwise>
+	
+											<set-variable variableName="idEditorial"
+												value="#[payload[0].k_codigo]" doc:name="Variable" />
+	
+											<logger message="Editorial #[idEditorial] ya existe"
+												level="INFO" doc:name="Logger" />
+										</otherwise>
+									</choice>
+	
+									<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+	
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into libro (k_ISBN,n_titulo,i_editorial,i_pais_publicacion) values(#[capituloLibro.isbn],#[capituloLibro.tituloLibro],#[idEditorial],(select k_codigo from pais where n_nombre like #[capituloLibro.pais.concat('%')]))]]></db:parameterized-query>
+									</db:insert>
+	
+									
+	
+								</when>
+								<otherwise>
+	
+									
+	
+									<logger message="ISBN #[capituloLibro.isbn] ya existe" level="INFO"
+										doc:name="Logger" />
+								</otherwise>
+							</choice>
+	
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration" 
+							autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+							doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into cap_libro_investigacion (c_ISBN_libro,n_titulo_cap,i_ano_publicacion,
+		                        b_validacion_inv_an5,c_categoria,b_clasificado,b_certificado_validacion) values(#[capituloLibro.isbn],#[capituloLibro.nombre],#[capituloLibro.ano],
+		                        #[capituloLibro.requisitosGuiaVerificacion],#[capituloLibro.categoria],#[capituloLibro.clasificado],#[capituloLibro.certificadoValidacion])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="idCapLibro"
+										value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+										
+							<set-variable variableName="autores"
+								value="#[capituloLibro.autores]" doc:name="Variable" />
+	
+							<foreach collection="autores" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="autor">
+								<set-variable variableName="autor" value="#[autores[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[autor.nombreCompleto]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe investigador" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Investigador #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+								
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into cap_libro_autor (i_cod_cap_libro,i_cod_integrante,i_cod_grupo_investigacion,i_integrante_grupo,i_grupos_colaboracion) values(#[idCapLibro],#[idAutor],#[codigoGrupo],#[autor.integranteGrupo],#[autor.gruposColaboracion])]]></db:parameterized-query>
+								</db:insert>
+								
+							</foreach>
+	
+	
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene capituloDeLibro" />
+						    </otherwise>
+					    </choice>
+						<!-- //capitulo libro -->
+						
+						<!-- consultoria -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.consultoria != null]">
+								<set-session-variable variableName="consultorias"
+								value="#[grupoInvestigacion.consultoria]" doc:name="Session Variable" />
+		
+								<foreach collection="consultorias" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="consultoria">
+							<set-variable variableName="consultoria" value="#[consultorias[i-1]]"
+								doc:name="Session Variable" />
+								
+							<logger message="#[consultorias[i-1].nombre]" level="INFO"
+								doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into consultoria(n_titulo,n_numero_contrato,f_fecha,b_certificacion_empresa,c_categoria,b_clasificado) 
+								values(#[consultoria.nombre],#[consultoria.numContrato],#[consultoria.fecha],#[consultoria.certificacionEmpresa],#[consultoria.categoria],#[consultoria.clasificado])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoConsultoria"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger message="Codigo consultoria generado #[codigoConsultoria]"
+								level="INFO" doc:name="Logger" />
+	
+							<set-variable variableName="autores"
+								value="#[consultorias[i-1].autores]" doc:name="Variable" />
+	
+							<foreach collection="autores" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="articulo">
+								<set-variable variableName="autor" value="#[autores[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[autor.nombreCompleto]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe investigador" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Investigador #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+	
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into consultoria_autor (i_cod_consultoria,i_cod_investigador,i_cod_grupo_investigacion,i_integrante_grupo,i_grupos_colaboracion) values(#[codigoConsultoria],#[idAutor],#[codigoGrupo],#[autor.integranteGrupo],#[autor.gruposColaboracion])]]></db:parameterized-query>
+								</db:insert>
+							</foreach>
+	
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene consultoria" />
+						    </otherwise>
+					    </choice>
+						<!-- //consultoria -->
+						
+						<!-- diseno industrial -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.disenoIndustrial != null]">
+								<set-session-variable variableName="disenosIndustriales"
+								value="#[grupoInvestigacion.disenoIndustrial]" doc:name="Session Variable" />
+		
+								<foreach collection="disenosIndustriales" doc:name="For Each"
+									counterVariableName="i" rootMessageVariableName="disenoIndustrial">
+									<set-variable variableName="disenoIndustrial"
+										value="#[disenosIndustriales[i-1]]" doc:name="Session Variable" />
+			
+									<logger message="#[disenosIndustriales[i-1].nombre]" level="INFO"
+										doc:name="Logger" />
+			
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into diseno_industrial (c_numero_reg,n_titulo_reg,i_ano_obtencion,
+				                        b_gaceta,i_pais_obtencion,b_contrato,c_categoria,b_clasificado) values(#[disenoIndustrial.numeroRegistro],#[disenoIndustrial.nombre],#[disenoIndustrial.ano],
+				                        #[disenoIndustrial.gaceta],(select k_codigo from pais where n_nombre like#[disenoIndustrial.pais.concat('%')]),#[disenoIndustrial.contrato],#[disenoIndustrial.categoria],#[disenoIndustrial.clasificado])]]></db:parameterized-query>
+			
+									</db:insert>
+									<logger message="#[payload]" level="INFO" doc:name="Logger" />
+									<set-variable variableName="codigoDisenoIndustrial"
+										value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									<logger
+										message="Codigo diseno industrial generado #[codigoDisenoIndustrial]"
+										level="INFO" doc:name="Logger" />
+			
+									<set-variable variableName="autores"
+										value="#[disenosIndustriales[i-1].autores]" doc:name="Variable" />
+			
+									<foreach collection="autores" doc:name="For Each"
+										counterVariableName="j" rootMessageVariableName="articulo">
+										<set-variable variableName="autor" value="#[autores[j-1]]"
+											doc:name="Variable" />
+			
+										<logger message="#[autor.nombreCompleto]" level="INFO"
+											doc:name="Logger" />
+			
+										<db:select config-ref="MySQL_Configuration" doc:name="Database">
+											<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+										</db:select>
+			
+										<logger message="#[payload]" level="INFO" doc:name="Logger" />
+			
+										<choice doc:name="Choice">
+											<when expression="#[payload.size() ==0]">
+												<logger message="no existe investigador" level="INFO"
+													doc:name="Logger" />
+												<db:insert config-ref="MySQL_Configuration"
+													autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+													doc:name="Database">
+													<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+												</db:insert>
+			
+												<set-variable variableName="idAutor"
+													value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+											</when>
+											<otherwise>
+												<logger message="Investigador #[payload] ya existe"
+													level="INFO" doc:name="Logger" />
+			
+												<set-variable variableName="idAutor"
+													value="#[payload[0].k_codigo]" doc:name="Variable" />
+											</otherwise>
+										</choice>
+			
+										<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+			
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into diseno_industrial_titular (i_cod_diseno_industrial,i_cod_investigador,i_cod_grupo_investigacion,i_integrante_grupo,i_grupos_colaboracion) values(#[codigoDisenoIndustrial],#[idAutor],#[codigoGrupo],#[autor.integranteGrupo],#[autor.gruposColaboracion])]]></db:parameterized-query>
+										</db:insert>
+									</foreach>
+			
+								</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene disenoIndustrial" />
+						    </otherwise>
+					    </choice>
+						<!-- //diseno industrial -->
+						
+						<!-- documento trabajo -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.documentoTrabajo != null]">
+								<set-session-variable variableName="documentosTrabajo"
+								value="#[grupoInvestigacion.documentoTrabajo]" doc:name="Session Variable" />
+					
+								<logger message="#[documentosTrabajo]" level="INFO"
+										doc:name="Logger" />
+								
+								<foreach collection="documentosTrabajo" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="documentoTrabajo">
+							<set-variable variableName="documentoTrabajo"
+								value="#[documentosTrabajo[i-1]]" doc:name="Session Variable" />
+	
+							<logger message="#[documentosTrabajo[i-1].nombre]" level="INFO"
+								doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into doc_trabajo (n_titulo,i_ano,n_pag_web,n_doi,
+		                        c_categoria,b_clasificado) values(#[documentoTrabajo.nombre],#[documentoTrabajo.ano],#[documentoTrabajo.url],#[documentoTrabajo.doi],#[documentoTrabajo.categoria],#[documentoTrabajo.clasificado])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoDocTrabajo"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger message="Codigo documento trabajo generado #[codigoDocTrabajo]"
+								level="INFO" doc:name="Logger" />
+							<!-- Insercion de autores -->
+							<set-variable variableName="autores"
+								value="#[documentosTrabajo[i-1].autores]" doc:name="Variable" />
+	
+							<foreach collection="autores" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="articulo">
+								<set-variable variableName="autor" value="#[autores[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[autor.nombreCompleto]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe investigador" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Investigador #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+	
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into doc_trabajo_autor (i_cod_doc_trabajo,i_cod_investigador,i_cod_grupo_investigacion) values(#[codigoDocTrabajo],#[idAutor],#[codigoGrupo])]]></db:parameterized-query>
+								</db:insert>
+							</foreach>
+	
+							<!-- Insercion de instituciones -->
+	
+							<set-variable variableName="instituciones"
+								value="#[documentosTrabajo[i-1].instituciones]" doc:name="Variable" />
+	
+							<foreach collection="instituciones" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="institucion">
+								<set-variable variableName="institucion" value="#[instituciones[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[institucion.nombre]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from entidad where n_nombre=#[institucion.nombre]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe investigador" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into entidad (n_nombre,b_institucion) values(#[institucion.nombre],1)]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idEntidad"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Investigador #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idEntidad"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idEntidad]" level="INFO" doc:name="Logger" />
+	
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into doc_trabajo_entidad (i_cod_doc_trabajo,i_cod_entidad) values(#[codigoDocTrabajo],#[idEntidad])]]></db:parameterized-query>
+								</db:insert>
+							</foreach>
+	
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene documentoTrabajo" />
+						    </otherwise>
+					    </choice>
+						<!-- //documento trabajo -->
+						
+						<!-- edicion -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.edicion != null]">
+								<set-session-variable variableName="ediciones"
+								value="#[grupoInvestigacion.edicion]" doc:name="Session Variable" />
+		
+								<foreach collection="ediciones" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="edicion">
+							<set-variable variableName="edicion" value="#[ediciones[i-1]]"
+								doc:name="Session Variable" />
+	
+							<logger message="#[ediciones[i-1].nombre]" level="INFO"
+								doc:name="Logger" />
+	
+							<set-variable variableName="autor" value="#[ediciones[i-1].autor]"
+								doc:name="Variable" />
+	
+							<logger message="#[autor.nombreCompleto]" level="INFO"
+								doc:name="Logger" />
+	
+							<db:select config-ref="MySQL_Configuration" doc:name="Database">
+								<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+							</db:select>
+	
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+							<choice doc:name="Choice">
+								<when expression="#[payload.size() ==0]">
+									<logger message="no existe investigador" level="INFO"
+										doc:name="Logger" />
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+									</db:insert>
+	
+									<set-variable variableName="idEditor"
+										value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+								</when>
+								<otherwise>
+									<logger message="Investigador #[payload] ya existe"
+										level="INFO" doc:name="Logger" />
+	
+									<set-variable variableName="idEditor" value="#[payload[0].k_codigo]"
+										doc:name="Variable" />
+								</otherwise>
+							</choice>
+	
+							<logger message="#[idEditor]" level="INFO" doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration" doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into edicion (n_titulo,n_issn_isbn,i_editor,
+		                        f_fecha_editor,i_ano,n_pag_web,c_categoria,b_clasificado,i_cod_grupo_investigacion) values(#[edicion.nombre],#[edicion.isbn_issn],
+		                        #[idEditor],#[edicion.fechaEditor],#[edicion.ano],#[edicion.paginaWeb],#[edicion.categoria],#[edicion.clasificado],#[codigoGrupo])]]></db:parameterized-query>
+							</db:insert>
+	
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene edicion" />
+						    </otherwise>
+					    </choice>
+						<!-- //edicion -->
+						
+						<!-- empresa base tecnologica -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.empresaBaseTecnologica != null]">
+								<set-session-variable variableName="empresasBaseTecnologica"
+								value="#[grupoInvestigacion.empresaBaseTecnologica]" doc:name="Session Variable" />
+		
+								<foreach collection="empresasBaseTecnologica" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="empresaBaseTecnologica">
+							<set-variable variableName="empresaBaseTecnologica" value="#[empresasBaseTecnologica[i-1]]"
+								doc:name="Session Variable" />
+	
+							<logger message="#[empresasBaseTecnologica[i-1].nombre]" level="INFO"
+								doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into emp_base_tec (n_nombre,b_certificado_camara,n_num_tributario,
+		                        b_certificacion_institucional,i_tipo_identificacion,i_tipo_empresa,c_categoria,b_clasificado) values(#[empresaBaseTecnologica.nombre],
+		                        #[empresaBaseTecnologica.certificadoCamaraComercio],#[empresaBaseTecnologica.nit],#[empresaBaseTecnologica.certificacionInstitucional],#[empresaBaseTecnologica.tipoIdentificacion],(select k_codigo from tipo_empresa where n_nombre=#[empresaBaseTecnologica.tipo]),
+		                        #[empresaBaseTecnologica.categoria],#[empresaBaseTecnologica.clasificado])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoEmpresaBaseTecnologica"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger message="Codigo empresa base tecnologica generado #[codigoEmpresaBaseTecnologica]"
+								level="INFO" doc:name="Logger" />
+	
+							<set-variable variableName="autores"
+								value="#[empresasBaseTecnologica[i-1].autores]" doc:name="Variable" />
+	
+							<foreach collection="autores" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="articulo">
+								<set-variable variableName="autor" value="#[autores[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[autor.nombreCompleto]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe investigador" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Investigador #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+	
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into emp_base_tec_autor (i_cod_emp_base_tec,i_cod_investigador,i_cod_grupo_investigacion,i_integrante_grupo,i_grupos_colaboracion) values(#[codigoEmpresaBaseTecnologica],#[idAutor],#[codigoGrupo],#[autor.integranteGrupo],#[autor.gruposColaboracion])]]></db:parameterized-query>
+								</db:insert>
+							</foreach>
+	
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene empresaBaseTecnologica" />
+						    </otherwise>
+					    </choice>
+						<!-- //empresa base tecnologica -->
+						
+						<!-- espacio participacion ciudadana cti -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.espacioParticipacionCiudadana != null]">
+								<set-session-variable variableName="participaciones"
+								value="#[grupoInvestigacion.espacioParticipacionCiudadana]" doc:name="Session Variable" />
+		
+								<foreach collection="participaciones" doc:name="For Each"
+								counterVariableName="i" rootMessageVariableName="participacion">
+								<set-variable variableName="participacion" value="#[participaciones[i-1]]"
+									doc:name="Session Variable" />
+		
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into espacio_part_proyecto_CTI (n_nombre_espacio,f_fecha_inicio,n_nombre_comunidad,
+			                        n_constancia_participacion,c_categoria,b_clasificado) values(#[participacion.nombre],#[participacion.fechaInicio],#[participacion.nombreComunidad],
+			                        #[participacion.constanciaParticipacion],#[participacion.categoria],#[participacion.clasificado])]]></db:parameterized-query>
+								</db:insert>
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+								<set-variable variableName="codigoEspacioParticipacion"
+									value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+								<logger
+									message="Codigo espacio participacion cti generado #[codigoEspacioParticipacion]"
+									level="INFO" doc:name="Logger" />
+		
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into espacio_part_proyecto_CTI_autor (i_cod_espacio_part_proyecto_CTI,i_cod_grupo_investigacion) values(#[codigoEspacioParticipacion],#[codigoGrupo])]]></db:parameterized-query>
+								</db:insert>
+		
+							</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene espacioParticipacionCiudadana" />
+						    </otherwise>
+					    </choice>
+						<!-- //espacio participacion ciudadana cti -->
+						
+						<!-- esquema circuito -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.esquemaCircuito != null]">
+								<set-session-variable variableName="esquemas"
+								value="#[grupoInvestigacion.esquemaCircuito]" doc:name="Session Variable" />
+		
+								<foreach collection="esquemas" doc:name="For Each"
+								counterVariableName="i" rootMessageVariableName="esquema">
+								<set-variable variableName="esquema" value="#[esquemas[i-1]]"
+									doc:name="Session Variable" />
+		
+								<logger message="#[esquemas[i-1].nombre]" level="INFO"
+									doc:name="Logger" />
+		
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into esq_circuito (c_num_registro,n_titulo_registro,i_ano_obtencion,
+			                        i_pais_obtencion,b_contrato,c_categoria,b_clasificado) values(#[esquema.numeroRegistro],#[esquema.nombre],#[esquema.ano],
+			                        (select k_codigo from pais where n_nombre like #[esquema.pais.concat('%')]),#[esquema.contrato],#[esquema.categoria],#[esquema.clasificado])]]></db:parameterized-query>
+								</db:insert>
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+								<set-variable variableName="codigoEsquemaCircuito"
+									value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+								<logger
+									message="Codigo esquema circuito generado #[codigoEsquemaCircuito]"
+									level="INFO" doc:name="Logger" />
+		
+								<set-variable variableName="autores" value="#[esquemas[i-1].autores]"
+									doc:name="Variable" />
+		
+								<foreach collection="autores" doc:name="For Each"
+									counterVariableName="j" rootMessageVariableName="articulo">
+									<set-variable variableName="autor" value="#[autores[j-1]]"
+										doc:name="Variable" />
+		
+									<logger message="#[autor.nombreCompleto]" level="INFO"
+										doc:name="Logger" />
+		
+									<db:select config-ref="MySQL_Configuration" doc:name="Database">
+										<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+									</db:select>
+		
+									<logger message="#[payload]" level="INFO" doc:name="Logger" />
+		
+									<choice doc:name="Choice">
+										<when expression="#[payload.size() ==0]">
+											<logger message="no existe investigador" level="INFO"
+												doc:name="Logger" />
+											<db:insert config-ref="MySQL_Configuration"
+												autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+												doc:name="Database">
+												<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+											</db:insert>
+		
+											<set-variable variableName="idAutor"
+												value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+										</when>
+										<otherwise>
+											<logger message="Investigador #[payload] ya existe"
+												level="INFO" doc:name="Logger" />
+		
+											<set-variable variableName="idAutor"
+												value="#[payload[0].k_codigo]" doc:name="Variable" />
+										</otherwise>
+									</choice>
+		
+									<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+		
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into esq_circuito_titular (i_cod_esq_circuito,i_cod_investigador,i_cod_grupo_investigacion,i_integrante_grupo,i_grupos_colaboracion) values(#[codigoEsquemaCircuito],#[idAutor],#[codigoGrupo],#[autor.integranteGrupo],#[autor.gruposColaboracion])]]></db:parameterized-query>
+									</db:insert>
+								</foreach>
+		
+							</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene esquemaCircuito" />
+						    </otherwise>
+					    </choice>
+						<!-- //esquema circuito -->
+						
+						<!-- estrategia comunicacion conocimiento -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.estrategiaComunicacionConocimiento != null]">
+								<set-session-variable variableName="estrategiasComunicacion"
+								value="#[grupoInvestigacion.estrategiaComunicacionConocimiento]" doc:name="Session Variable" />
+		
+								<foreach collection="estrategiasComunicacion" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="estrategiaComunicacion">
+							<set-variable variableName="estrategiaComunicacion"
+								value="#[estrategiasComunicacion[i-1]]" doc:name="Session Variable" />
+	
+							<logger message="#[estrategiasComunicacion[i-1].nombre]"
+								level="INFO" doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into est_comunicacion_conocimiento (n_nombre,f_fecha_inicio,i_lider,n_nombre_comunidad,
+		                        b_certificacion,c_categoria,b_clasificado) values(#[estrategiaComunicacion.nombre],#[estrategiaComunicacion.fechaInicio],#[estrategiaComunicacion.lider],#[estrategiaComunicacion.nombreComunidad],
+		                        #[estrategiaComunicacion.certificacion],#[estrategiaComunicacion.categoria],#[estrategiaComunicacion.clasificado])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoEstrategiaComunicacion"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger
+								message="Codigo estrategia comunicacion conocimiento generado #[codigoEstrategiaComunicacion]"
+								level="INFO" doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into est_comunicacion_conocimiento_investigador (i_cod_est_comunicacion_conocimiento,i_cod_grupo_investigacion) values(#[codigoEstrategiaComunicacion],#[codigoGrupo])]]></db:parameterized-query>
+							</db:insert>
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene estrategiaComunicacionConocimiento" />
+						    </otherwise>
+					    </choice>
+						<!-- //estrategia comunicacion conocimiento -->
+						
+						<!-- estrategia pedagogica fomento cti -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.estrategiaPedagogicaFomentoCTI != null]">
+								<set-session-variable variableName="estrategiasPedagogicas" 
+								value="#[grupoInvestigacion.estrategiaPedagogicaFomentoCTI]" doc:name="Session Variable"/>
+			                
+				                <foreach collection="estrategiasPedagogicas" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="estrategiaPedagogica">
+							<set-variable variableName="estrategiaPedagogica"
+								value="#[estrategiasPedagogicas[i-1]]" doc:name="Session Variable" />
+	
+							<logger message="#[estrategiasPedagogicas[i-1].nombre]"
+								level="INFO" doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into est_fomento_CTI (n_nombre,f_fecha_inicio,i_investigador_principal,
+		                        b_certificado,c_categoria,b_clasificado,i_cod_grupo_investigacion) values(#[estrategiaPedagogica.nombre],#[estrategiaPedagogica.fechaInicio],#[estrategiaPedagogica.investigador],
+		                        #[estrategiaPedagogica.certificado],#[estrategiaPedagogica.categoria],#[estrategiaPedagogica.clasificado],#[codigoGrupo])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoEstrategiaComunicacion"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger
+								message="Codigo estrategia pedagogica CTI generado #[codigoEstrategiaComunicacion]"
+								level="INFO" doc:name="Logger" />
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene estrategiaPedagogicaFomentoCTI" />
+						    </otherwise>
+					    </choice>
+						<!-- //estrategia pedagogica fomento cti -->
+						
+						<!-- evento cientifico -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.eventoCientifico != null]">
+								<set-session-variable variableName="eventosCientificos"
+								value="#[grupoInvestigacion.eventoCientifico]" doc:name="Session Variable" />
+		
+								<foreach collection="eventosCientificos" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="eventoCientifico">
+							<set-variable variableName="eventoCientifico"
+								value="#[eventosCientificos[i-1]]" doc:name="Session Variable" />
+	
+							<logger message="#[eventosCientificos[i-1].nombre]" level="INFO"
+								doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into evento_cientifico (n_nombre,i_ano_inicio,f_fecha_fin) values(#[eventoCientifico.nombre],#[eventoCientifico.ano],#[eventoCientifico.fechaFin])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoEventoCientifico"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger
+								message="Codigo evento cientifico generado #[codigoEventoCientifico]"
+								level="INFO" doc:name="Logger" />
+	
+							<set-variable variableName="instituciones"
+								value="#[eventosCientificos[i-1].instituciones]" doc:name="Variable" />
+	
+							<foreach collection="instituciones" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="institucion">
+								<set-variable variableName="institucion" value="#[instituciones[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[institucion.nombre]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from entidad where n_nombre=#[institucion.nombreCompleto]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe institucion" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into entidad (n_nombre,b_institucion) values(#[institucion.nombre],1)]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idInstitucion"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Institucion #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idInstitucion"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idInstitucion]" level="INFO" doc:name="Logger" />
+	
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into evento_cientifico_entidad (i_cod_evento_cientifico,i_cod_entidad) values(#[codigoEventoCientifico],#[idInstitucion])]]></db:parameterized-query>
+								</db:insert>
+							</foreach>
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into evento_cientifico_investigador (i_cod_evento_cientifico,i_tipo_participacion,c_categoria,b_clasificado,i_cod_grupo_investigacion) values(#[codigoEventoCientifico],(select k_codigo from tipo_participacion_evento where n_nombre=#[eventoCientifico.tipoParticipacion]),#[eventoCientifico.categoria],#[eventoCientifico.clasificado],#[codigoGrupo])]]></db:parameterized-query>
+							</db:insert>
+	
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene eventoCientifico" />
+						    </otherwise>
+					    </choice>
+						<!-- //evento cientifico -->
+						
+						<!-- generacion-contenido impreso-->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.generacionContenidoImpreso != null]">
+								<set-session-variable variableName="contenidosImpresos"
+								value="#[grupoInvestigacion.generacionContenidoImpreso]" doc:name="Session Variable" />
+		
+								<foreach collection="contenidosImpresos" doc:name="For Each"
+								counterVariableName="i" rootMessageVariableName="contenidoImpreso">
+								<set-variable variableName="contenidoImpreso"
+									value="#[contenidosImpresos[i-1]]" doc:name="Session Variable" />
+		
+								<logger message="#[contenidosImpresos[i-1].nombre]" level="INFO"
+									doc:name="Logger" />
+		
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into gen_cont_impreso (n_titulo,i_ano_publicacion,n_medio_circulacion,n_ambito,
+			                        n_lugar_publicacion,b_certificacion,c_categoria,b_clasificado) values(#[contenidoImpreso.nombre],#[contenidoImpreso.ano],
+			                        #[contenidoImpreso.medioCirculacion],#[contenidoImpreso.ambito],#[contenidoImpreso.lugarPublicacion],#[contenidoImpreso.certificacion],#[contenidoImpreso.categoria],#[contenidoImpreso.clasificado])]]></db:parameterized-query>
+								</db:insert>
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+								<set-variable variableName="codigoContenidoImpreso"
+									value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+								<logger
+									message="Codigo contenido impreso generado #[codigoContenidoImpreso]"
+									level="INFO" doc:name="Logger" />
+		
+								<set-variable variableName="autores"
+									value="#[contenidosImpresos[i-1].autores]" doc:name="Variable" />
+								<choice doc:name="Choice">
+									<when expression="#[contenidosImpresos[i-1].autores == empty]">
+										<logger message="No existen autores" level="INFO"
+											doc:name="Logger" />
+		
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into gen_cont_impreso_autor (i_cod_gen_contenido,i_cod_grupo_investigacion) values(#[codigoContenidoImpreso],#[codigoGrupo])]]></db:parameterized-query>
+										</db:insert>
+									</when>
+									<otherwise>
+										<foreach collection="autores" doc:name="For Each"
+											counterVariableName="j" rootMessageVariableName="articulo">
+											<set-variable variableName="autor" value="#[autores[j-1]]"
+												doc:name="Variable" />
+		
+											<logger message="#[autor.nombreCompleto]" level="INFO"
+												doc:name="Logger" />
+		
+											<db:select config-ref="MySQL_Configuration" doc:name="Database">
+												<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+											</db:select>
+		
+											<logger message="#[payload]" level="INFO" doc:name="Logger" />
+		
+											<choice doc:name="Choice">
+												<when expression="#[payload.size() ==0]">
+													<logger message="no existe investigador" level="INFO"
+														doc:name="Logger" />
+													<db:insert config-ref="MySQL_Configuration"
+														autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+														doc:name="Database">
+														<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+													</db:insert>
+		
+													<set-variable variableName="idAutor"
+														value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+												</when>
+												<otherwise>
+													<logger message="Investigador #[payload] ya existe"
+														level="INFO" doc:name="Logger" />
+		
+													<set-variable variableName="idAutor"
+														value="#[payload[0].k_codigo]" doc:name="Variable" />
+												</otherwise>
+											</choice>
+		
+											<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+		
+											<db:insert config-ref="MySQL_Configuration"
+												autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+												doc:name="Database">
+												<db:parameterized-query><![CDATA[insert into gen_cont_impreso_autor (i_cod_gen_contenido,i_cod_investigador,i_cod_grupo_investigacion) values(#[codigoContenidoImpreso],#[idAutor],#[codigoGrupo])]]></db:parameterized-query>
+											</db:insert>
+										</foreach>
+									</otherwise>
+								</choice>
+		
+							</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene generacionContenidoImpreso" />
+						    </otherwise>
+					    </choice>
+						<!-- //generacion-contenido impreso-->
+						
+						<!-- generacion-contenido multimedia-->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.generacionContenidoMultimedia != null]">
+								<set-session-variable variableName="contenidosMultimedia"
+								value="#[grupoInvestigacion.generacionContenidoMultimedia]" doc:name="Session Variable" />
+		
+								<foreach collection="contenidosMultimedia" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="contenidoMultimedia">
+							<set-variable variableName="contenidoMultimedia"
+								value="#[contenidosMultimedia[i-1]]" doc:name="Session Variable" />
+	
+							<logger message="#[contenidosMultimedia[i-1].nombre]"
+								level="INFO" doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into gen_cont_multimedia (n_titulo,n_ambito,n_comunidades,
+		                        n_resumen,f_fecha,n_medio_circulacion,b_certificacion,c_categoria,b_clasificado) values(#[contenidoMultimedia.nombre],#[contenidoMultimedia.ambito],#[contenidoMultimedia.comunidades],
+		                        #[contenidoMultimedia.resumen],#[contenidoMultimedia.fecha],#[contenidoMultimedia.medioCirculacion],#[contenidoMultimedia.certificacion],#[contenidoMultimedia.categoria],#[contenidoMultimedia.clasificado])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoContenidoMultimedia"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger
+								message="Codigo contenido multimedia generado #[codigoContenidoMultimedia]"
+								level="INFO" doc:name="Logger" />
+	
+							<set-variable variableName="autores"
+								value="#[contenidosMultimedia[i-1].autores]" doc:name="Variable" />
+	
+							<foreach collection="autores" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="articulo">
+								<set-variable variableName="autor" value="#[autores[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[autor.nombreCompleto]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe investigador" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Investigador #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+	
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into gen_cont_multimedia_participante (i_cod_gen_cont_multimedia,i_cod_investigador,i_cod_grupo_investigacion) values(#[codigoContenidoMultimedia],#[idAutor],#[codigoGrupo])]]></db:parameterized-query>
+								</db:insert>
+							</foreach>
+	
+							<set-variable variableName="instituciones"
+								value="#[contenidosMultimedia[i-1].instituciones]" doc:name="Variable" />
+	
+							<foreach collection="instituciones" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="institucion">
+								<set-variable variableName="institucion" value="#[instituciones[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[institucion.nombre]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from entidad where n_nombre=#[institucion.nombreCompleto]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe institucion" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into entidad (n_nombre,b_institucion) values(#[institucion.nombre],1)]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idInstitucion"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Institucion #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idInstitucion"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idInstitucion]" level="INFO" doc:name="Logger" />
+	
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into gen_cont_multimedia_entidad (i_cod_gen_cont_multimedia,i_cod_entidad) values(#[codigoContenidoMultimedia],#[idInstitucion])]]></db:parameterized-query>
+								</db:insert>
+							</foreach>
+	
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene generacionContenidoMultimedia" />
+						    </otherwise>
+					    </choice>	
+						<!-- //generacion-contenido multimedia-->
+						
+						<!-- generacion-contenido virtual-->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.generacionContenidoVirtual != null]">
+								<set-session-variable variableName="contenidosVirtuales"
+								value="#[grupoInvestigacion.generacionContenidoVirtual]" doc:name="Session Variable" />
+		
+								<foreach collection="contenidosVirtuales" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="contenidoVirtual">
+							<set-variable variableName="contenidoVirtual"
+								value="#[contenidosVirtuales[i-1]]" doc:name="Session Variable" />
+	
+							<logger message="#[contenidosVirtuales[i-1].nombre]" level="INFO"
+								doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into gen_cont_virtual (n_titulo,n_comunidad,n_resumen,
+		                        f_fecha,n_medio_circulacion,n_pag_web,b_certificacion,c_categoria,b_clasificado) values(#[contenidoVirtual.nombre],#[contenidoVirtual.comunidad],
+		                        #[contenidoVirtual.resumen],#[contenidoVirtual.fecha],#[contenidoVirtual.medioCirculacion],#[contenidoVirtual.url],#[contenidoVirtual.certificacion],#[contenidoVirtual.categoria],#[contenidoVirtual.clasificado])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoContenidoVirtual"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger
+								message="Codigo contenido virtual generado #[codigoContenidoVirtual]"
+								level="INFO" doc:name="Logger" />
+	
+							<set-variable variableName="autores"
+								value="#[contenidosVirtuales[i-1].autores]" doc:name="Variable" />
+	
+							<foreach collection="autores" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="articulo">
+								<set-variable variableName="autor" value="#[autores[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[autor.nombreCompleto]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe investigador" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Investigador #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+	
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into gen_cont_virtual_autor (i_cod_gen_cont_virtual,i_cod_investigador,i_cod_grupo_investigacion) values(#[codigoContenidoVirtual],#[idAutor],#[codigoGrupo])]]></db:parameterized-query>
+								</db:insert>
+							</foreach>
+	
+							<set-variable variableName="instituciones"
+								value="#[contenidosVirtuales[i-1].instituciones]" doc:name="Variable" />
+	
+							<foreach collection="instituciones" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="institucion">
+								<set-variable variableName="institucion" value="#[instituciones[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[institucion.nombre]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from entidad where n_nombre=#[institucion.nombreCompleto]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe institucion" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into entidad (n_nombre,b_institucion) values(#[institucion.nombre],1)]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idInstitucion"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Institucion #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idInstitucion"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idInstitucion]" level="INFO" doc:name="Logger" />
+	
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into gen_cont_virtual_entidad (i_cod_gen_cont_virtual,i_cod_entidad) values(#[codigoContenidoVirtual],#[idInstitucion])]]></db:parameterized-query>
+								</db:insert>
+							</foreach>
+	
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene generacionContenidoVirtual" />
+						    </otherwise>
+					    </choice>	
+						<!-- //generacion-contenido virtual-->
+						
+						<!-- informe final investigacion -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.informeInvestigacion != null]">
+								<set-session-variable variableName="informesFinales"
+								value="#[grupoInvestigacion.informeInvestigacion]" doc:name="Session Variable" />
+		
+								<foreach collection="informesFinales" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="informeFinal">
+							<set-variable variableName="informeFinal" value="#[informesFinales[i-1]]"
+								doc:name="Session Variable" />
+	
+							<logger message="#[informesFinales[i-1].nombre]" level="INFO"
+								doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into informe_final(n_titulo,n_nombre_proyecto,i_ano_elaboracion,c_categoria,b_clasificado) 
+								values(#[informeFinal.nombre],#[informeFinal.proyecto],#[informeFinal.ano],#[informeFinal.categoria],#[informeFinal.clasificado])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoInformeFinal"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger message="Codigo informe final generado #[codigoInformeFinal]"
+								level="INFO" doc:name="Logger" />
+	
+							<set-variable variableName="autores"
+								value="#[informesFinales[i-1].autores]" doc:name="Variable" />
+	
+							<foreach collection="autores" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="articulo">
+								<set-variable variableName="autor" value="#[autores[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[autor.nombreCompleto]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe investigador" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Investigador #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+	
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into informe_final_autor (i_cod_informe_final,i_cod_investigador,i_cod_grupo_investigacion) values(#[codigoInformeFinal],#[idAutor],#[codigoGrupo])]]></db:parameterized-query>
+								</db:insert>
+							</foreach>
+	
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene informeInvestigacion" />
+						    </otherwise>
+					    </choice>
+						<!-- //informe final investigacion -->
+						
+						<!-- informe tecnico final -->
+						<!-- <set-session-variable variableName="informesTecnicos"
+						value="#[grupoInvestigacion.]" doc:name="Session Variable" />
+
+						<foreach collection="informesTecnicos" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="informeTecnico">
+							<set-variable variableName="informeTecnico" value="#[informesTecnicos[i-1]]"
+								doc:name="Session Variable" />
+	
+							<logger message="#[informesTecnicos[i-1].nombre]" level="INFO"
+								doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into informe_tec(n_titulo,n_titulo_inv,f_fecha,b_certificacion_entidad,c_categoria,b_clasificado) 
+								values(#[informeTecnico.nombre],#[informeTecnico.tituloInvestigacion],#[informeTecnico.fecha],#[informeTecnico.certificacion],#[informeTecnico.categoria],#[informeTecnico.clasificado])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoInformeTecnico"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger message="Codigo informe tecnico generado #[codigoInformeTecnico]"
+								level="INFO" doc:name="Logger" />
+	
+							<set-variable variableName="autores"
+								value="#[informesTecnicos[i-1].autores]" doc:name="Variable" />
+	
+							<foreach collection="autores" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="articulo">
+								<set-variable variableName="autor" value="#[autores[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[autor.nombreCompleto]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe investigador" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Investigador #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+	
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into informe_tec_autor (i_cod_informe,i_cod_investigador,i_cod_grupo_investigacion,i_integrante_grupo,i_grupos_colaboracion) values(#[codigoInformeTecnico],#[idAutor],#[codigoGrupo],#[autor.integranteGrupo],#[autor.gruposColaboracion])]]></db:parameterized-query>
+								</db:insert>
+							</foreach>
+	
+						</foreach>-->
+						<!-- //informe tecnico final -->
+						
+						<!-- innovacion procedimiento servicio -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.innovacionProceso != null]">
+								<set-session-variable variableName="innovaciones"
+								value="#[grupoInvestigacion.innovacionProceso]" doc:name="Session Variable" />
+		
+								<foreach collection="innovaciones" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="innovacion">
+							<set-variable variableName="innovacion" value="#[innovaciones[i-1]]"
+								doc:name="Session Variable" />
+	
+							<logger message="#[innovaciones[i-1].nombre]" level="INFO"
+								doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into innovacion_ps(n_nombre,f_fecha,n_nombre_empresa,n_nit,b_certificado_imp_peq,b_certificado_imp_med,b_certificado_imp_gran,c_categoria,b_clasificado) 
+								values(#[innovacion.nombre],#[innovacion.fecha],#[innovacion.institucion],#[innovacion.nit],#[innovacion.certificadoImpPeq],#[innovacion.certificadoImpMed],#[innovacion.certificadoImpGran],#[innovacion.categoria],#[innovacion.clasificado])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoInnovacion"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger message="Codigo innovacion procedimiento servicio generado #[codigoInnovacion]"
+								level="INFO" doc:name="Logger" />
+	
+							<set-variable variableName="autores"
+								value="#[innovaciones[i-1].autores]" doc:name="Variable" />
+	
+							<foreach collection="autores" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="articulo">
+								<set-variable variableName="autor" value="#[autores[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[autor.nombreCompleto]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe investigador" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Investigador #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+	
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into innovacion_ps_autor (i_cod_innovacion_ps,i_cod_investigador,i_cod_grupo_investigacion,i_integrante_grupo,i_grupos_colaboracion) values(#[codigoInnovacion],#[idAutor],#[codigoGrupo],#[autor.integranteGrupo],#[autor.gruposColaboracion])]]></db:parameterized-query>
+								</db:insert>
+							</foreach>
+	
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene innovacionProceso" />
+						    </otherwise>
+					    </choice>
+						<!-- //innovacion procedimiento servicio -->
+						
+						<!-- libro investigacion -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.librosResultadoInvestigacion != null]">
+								<set-session-variable variableName="libros"
+								value="#[grupoInvestigacion.librosResultadoInvestigacion]" doc:name="Session Variable" />
+								<foreach collection="libros" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="libro">
+							<set-variable variableName="libro" value="#[libros[i-1]]"
+								doc:name="Session Variable" />
+	
+							<!-- Verificacion de Libro -->
+	
+							<db:select config-ref="MySQL_Configuration" doc:name="Database">
+								<db:parameterized-query><![CDATA[select k_ISBN from libro where k_ISBN=#[libro.isbn] and n_titulo=#[libro.nombre]]]></db:parameterized-query>
+							</db:select>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+							<choice doc:name="Choice">
+								<when expression="#[payload.size() ==0]">
+									<logger message="no existe isbn" level="INFO" doc:name="Logger" />
+	
+									<!-- Verificacion de Editorial -->
+	
+									<db:select config-ref="MySQL_Configuration" doc:name="Database">
+										<db:parameterized-query><![CDATA[select k_codigo from editorial where n_nombre=#[libro.editorial]]]></db:parameterized-query>
+									</db:select>
+									<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+									<choice doc:name="Choice">
+										<when expression="#[payload.size() ==0]">
+											<logger message="no existe editorial" level="INFO"
+												doc:name="Logger" />
+											<db:insert config-ref="MySQL_Configuration"
+												autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+												doc:name="Database">
+												<db:parameterized-query><![CDATA[insert into editorial (n_nombre) values(#[libro.editorial])]]></db:parameterized-query>
+											</db:insert>
+	
+											<set-variable variableName="idEditorial"
+												value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+	
+										</when>
+										<otherwise>
+	
+											<set-variable variableName="idEditorial"
+												value="#[payload[0].k_codigo]" doc:name="Variable" />
+	
+											<logger message="Editorial #[idEditorial] ya existe"
+												level="INFO" doc:name="Logger" />
+										</otherwise>
+									</choice>
+	
+									<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+	
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into libro (k_ISBN,n_titulo,i_editorial,i_pais_publicacion) values(#[libro.isbn],#[libro.nombre],#[idEditorial],(select k_codigo from pais where n_nombre like #[libro.pais.concat('%')]))]]></db:parameterized-query>
+									</db:insert>
+	
+	
+	
+								</when>
+								<otherwise>
+	
+	
+	
+									<logger message="ISBN #[libro.isbn] ya existe"
+										level="INFO" doc:name="Logger" />
+								</otherwise>
+							</choice>
+	
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into libro_investigacion (c_ISBN_libro,i_ano_publicacion,
+		                        b_validacion_inv_an5,c_categoria,b_clasificado,b_certificado_validacion) values(#[libro.isbn],#[libro.ano],
+		                        #[libro.requisitosGuiaVerificacion],#[libro.categoria],#[libro.clasificado],#[libro.certificadoValidacion])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="idLibro"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+	
+							<set-variable variableName="autores" value="#[libro.autores]"
+								doc:name="Variable" />
+	
+							<foreach collection="autores" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="autor">
+								<set-variable variableName="autor" value="#[autores[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[autor.nombreCompleto]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe investigador" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Investigador #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+	
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into libro_autor (i_cod_libro,i_cod_investigador,i_cod_grupo_investigacion,i_integrante_grupo,i_grupos_colaboracion) values(#[idLibro],#[idAutor],#[codigoGrupo],#[autor.integranteGrupo],#[autor.gruposColaboracion])]]></db:parameterized-query>
+								</db:insert>
+							</foreach>
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene librosResultadoInvestigacion" />
+						    </otherwise>
+					    </choice>
+						<!-- //libro investigacion -->
+						
+						<!-- participacion ciudadana proyecto cti -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.participacionCiudadanaProyectoCTI != null]">
+								<set-session-variable variableName="participacionesCti"
+								value="#[grupoInvestigacion.participacionCiudadanaProyectoCTI]" doc:name="Session Variable" />
+		
+								<foreach collection="participacionesCti" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="participacionCti">
+							<set-variable variableName="participacionCti"
+								value="#[participacionesCti[i-1]]" doc:name="Session Variable" />
+	
+							<logger message="#[participacionesCti[i-1].nombre]" level="INFO"
+								doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into part_ciud_proyecto_CTI (n_titulo,n_nombre_comunidad,n_constancia_participacion,c_categoria,b_clasificado,i_cod_grupo_investigacion) values(#[participacionCti.nombre],#[participacionCti.comunidadesParticipantes],#[participacionCti.constanciaParticipacion],#[participacionCti.categoria],#[participacionCti.clasificado],#[codigoGrupo])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoParticipacionCti"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger
+								message="Codigo evento cientifico generado #[codigoParticipacionCti]"
+								level="INFO" doc:name="Logger" />
+	
+							<set-variable variableName="instituciones"
+								value="#[participacionesCti[i-1].instituciones]" doc:name="Variable" />
+							<choice doc:name="Choice">
+								<when expression="#[participacionesCti[i-1].instituciones != empty]">
+									<foreach collection="instituciones" doc:name="For Each"
+										counterVariableName="j" rootMessageVariableName="institucion">
+										<set-variable variableName="institucion" value="#[instituciones[j-1]]"
+											doc:name="Variable" />
+	
+										<logger message="#[institucion.nombre]" level="INFO"
+											doc:name="Logger" />
+	
+										<db:select config-ref="MySQL_Configuration" doc:name="Database">
+											<db:parameterized-query><![CDATA[select k_codigo from entidad where n_nombre=#[institucion.nombreCompleto]]]></db:parameterized-query>
+										</db:select>
+	
+										<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+										<choice doc:name="Choice">
+											<when expression="#[payload.size() ==0]">
+												<logger message="no existe institucion" level="INFO"
+													doc:name="Logger" />
+												<db:insert config-ref="MySQL_Configuration"
+													autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+													doc:name="Database">
+													<db:parameterized-query><![CDATA[insert into entidad (n_nombre,b_institucion) values(#[institucion.nombre],1)]]></db:parameterized-query>
+												</db:insert>
+	
+												<set-variable variableName="idInstitucion"
+													value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+											</when>
+											<otherwise>
+												<logger message="Institucion #[payload] ya existe"
+													level="INFO" doc:name="Logger" />
+	
+												<set-variable variableName="idInstitucion"
+													value="#[payload[0].k_codigo]" doc:name="Variable" />
+											</otherwise>
+										</choice>
+	
+										<logger message="#[idInstitucion]" level="INFO"
+											doc:name="Logger" />
+	
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into part_proy_CTI_entidad (i_cod_part_proyecto_CTI,i_cod_entidad) values(#[codigoProyectoCti],#[idInstitucion])]]></db:parameterized-query>
+										</db:insert>
+									</foreach>
+								</when>
+								<otherwise>
+									<logger message="No hay instituciones en payload" level="INFO"
+										doc:name="Logger" />
+								</otherwise>
+							</choice>
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene participacionCiudadanaProyectoCTI" />
+						    </otherwise>
+					    </choice>
+						<!-- //participacion ciudadana proyecto cti -->
+						
+						<!-- patente -->
+						
+						<!-- //patente -->
+						
+						<!-- planta piloto -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.plantaPiloto != null]">
+								<set-session-variable variableName="plantasPiloto" 
+								value="#[grupoInvestigacion.plantaPiloto]" doc:name="Session Variable"/>
+			                
+			                	<foreach collection="plantasPiloto" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="plantaPiloto">
+							<set-variable variableName="plantaPiloto" value="#[plantasPiloto[i-1]]"
+								doc:name="Session Variable" />
+								
+							<logger message="#[plantasPiloto[i-1].nombre]" level="INFO"
+								doc:name="Logger" />
+	
+							<set-variable variableName="institucion" value="#[plantasPiloto[i-1].institucion]"
+								doc:name="Variable" />
+
+							<logger message="#[institucion]" level="INFO"
+								doc:name="Logger" />
+
+							<db:select config-ref="MySQL_Configuration" doc:name="Database">
+								<db:parameterized-query><![CDATA[select k_codigo from entidad where n_nombre=#[institucion]]]></db:parameterized-query>
+							</db:select>
+
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+
+							<choice doc:name="Choice">
+								<when expression="#[payload.size() ==0]">
+									<logger message="no existe institucion" level="INFO"
+										doc:name="Logger" />
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into entidad (n_nombre,b_institucion) values(#[institucion],1)]]></db:parameterized-query>
+									</db:insert>
+
+									<set-variable variableName="idInstitucion"
+										value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+								</when>
+								<otherwise>
+									<logger message="Institucion #[payload] ya existe"
+										level="INFO" doc:name="Logger" />
+
+									<set-variable variableName="idInstitucion"
+										value="#[payload[0].k_codigo]" doc:name="Variable" />
+								</otherwise>
+							</choice>
+
+							<logger message="#[idInstitucion]" level="INFO" doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into planta_piloto(n_nombre,f_fecha,i_institucion_financiadora,b_copia_contrato,i_pais_elaboracion,c_categoria,b_clasificado) 
+								values(#[plantaPiloto.nombre],#[plantaPiloto.fecha],#[idInstitucion],#[plantaPiloto.copiaContrato],(select k_codigo from pais where n_nombre=#[plantaPiloto.pais]),#[plantaPiloto.categoria],#[plantaPiloto.clasificado])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoPlantaPiloto"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger message="Codigo planta piloto generado #[codigoPlantaPiloto]"
+								level="INFO" doc:name="Logger" />
+	
+							<set-variable variableName="autores"
+								value="#[plantasPiloto[i-1].autores]" doc:name="Variable" />
+	
+							<foreach collection="autores" doc:name="For Each"
+								counterVariableName="j" rootMessageVariableName="articulo">
+								<set-variable variableName="autor" value="#[autores[j-1]]"
+									doc:name="Variable" />
+	
+								<logger message="#[autor.nombreCompleto]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe investigador" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Investigador #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idAutor"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+	
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into planta_piloto_autor (i_cod_planta_piloto,i_cod_investigador,i_cod_grupo_investigacion,i_integrante_grupo,i_grupos_colaboracion) values(#[codigoPlantaPiloto],#[idAutor],#[codigoGrupo],#[autor.integranteGrupo],#[autor.gruposColaboracion])]]></db:parameterized-query>
+								</db:insert>
+							</foreach>
+	
+						</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene plantaPiloto" />
+						    </otherwise>
+					    </choice>
+						<!-- //planta piloto -->
+						
+						<!-- prototipo industrial -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.prototipo != null]">
+								<set-session-variable variableName="prototiposIndustriales" 
+								value="#[grupoInvestigacion.prototipo]" doc:name="Session Variable"/>
+			                
+			                	<foreach collection="prototiposIndustriales" doc:name="For Each"
+								counterVariableName="i" rootMessageVariableName="prototipoIndustrial">
+								<set-variable variableName="prototipoIndustrial" value="#[prototiposIndustriales[i-1]]"
+									doc:name="Session Variable" />
+									
+								<logger message="#[prototiposIndustriales[i-1].nombre]" level="INFO"
+									doc:name="Logger" />
+		
+								<set-variable variableName="institucion" value="#[prototiposIndustriales[i-1].institucion]"
+									doc:name="Variable" />
+	
+								<logger message="#[institucion]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from entidad where n_nombre=#[institucion]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe institucion" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into entidad (n_nombre,b_institucion) values(#[institucion],1)]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idInstitucion"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Institucion #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idInstitucion"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+								<logger message="#[idInstitucion]" level="INFO" doc:name="Logger" />
+		
+								<db:insert config-ref="MySQL_Configuration"
+									autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+									doc:name="Database">
+									<db:parameterized-query><![CDATA[insert into prototipo_ind(n_nombre,f_fecha,i_institucion_financiadora,i_pais_obtencion,c_categoria,b_clasificado) 
+									values(#[prototipoIndustrial.nombre],#[prototipoIndustrial.fecha],#[idInstitucion],(select k_codigo from pais where n_nombre=#[prototipoIndustrial.pais]),#[prototipoIndustrial.categoria],#[prototipoIndustrial.clasificado])]]></db:parameterized-query>
+								</db:insert>
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+								<set-variable variableName="codigoPrototipoIndustrial"
+									value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+								<logger message="Codigo prototipo industrial generado #[codigoPrototipoIndustrial]"
+									level="INFO" doc:name="Logger" />
+		
+								<set-variable variableName="autores"
+									value="#[prototiposIndustriales[i-1].autores]" doc:name="Variable" />
+		
+								<foreach collection="autores" doc:name="For Each"
+									counterVariableName="j" rootMessageVariableName="articulo">
+									<set-variable variableName="autor" value="#[autores[j-1]]"
+										doc:name="Variable" />
+		
+									<logger message="#[autor.nombreCompleto]" level="INFO"
+										doc:name="Logger" />
+		
+									<db:select config-ref="MySQL_Configuration" doc:name="Database">
+										<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+									</db:select>
+		
+									<logger message="#[payload]" level="INFO" doc:name="Logger" />
+		
+									<choice doc:name="Choice">
+										<when expression="#[payload.size() ==0]">
+											<logger message="no existe investigador" level="INFO"
+												doc:name="Logger" />
+											<db:insert config-ref="MySQL_Configuration"
+												autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+												doc:name="Database">
+												<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+											</db:insert>
+		
+											<set-variable variableName="idAutor"
+												value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+										</when>
+										<otherwise>
+											<logger message="Investigador #[payload] ya existe"
+												level="INFO" doc:name="Logger" />
+		
+											<set-variable variableName="idAutor"
+												value="#[payload[0].k_codigo]" doc:name="Variable" />
+										</otherwise>
+									</choice>
+		
+									<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+		
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into prototipo_ind_autor (i_cod_prototipo_ind,i_cod_investigador,i_cod_grupo_investigacion,i_integrante_grupo,i_grupos_colaboracion) values(#[codigoPrototipoIndustrial],#[idAutor],#[codigoGrupo],#[autor.integranteGrupo],#[autor.gruposColaboracion])]]></db:parameterized-query>
+									</db:insert>
+								</foreach>
+		
+							</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene plantaPiloto" />
+						    </otherwise>
+					    </choice>
+						<!-- //prototipo industrial -->
+						
+						<!-- proyecto extension cti -->
+						<!-- <set-session-variable variableName="proyectosExtension" 
+						value="#[grupoInvestigacion.]" doc:name="Session Variable"/>
+	                
+		                <foreach collection="proyectosExtension" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="proyectoExtension">
+							<set-variable variableName="proyectoExtension" value="#[proyectosExtension[i-1]]"
+								doc:name="Session Variable" />
+	
+							<logger message="#[proyectosExtension[i-1].nombre]" level="INFO"
+								doc:name="Logger" />						
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into proyecto_ext_CTI(n_nombre,f_fecha_inicio,f_fecha_fin,n_nombre_comunidad,n_resumen_ctel,c_categoria,b_clasificado) 
+									values(#[proyectoExtension.nombre],#[proyectoExtension.fechaInicio],#[proyectoExtension.fechaFin],#[proyectoExtension.nombreComunidad],#[proyectoExtension.resumenCtel],#[proyectoExtension.categoria],#[proyectoExtension.clasificado])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoProyectoExtension"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger message="Codigo proyecto generado #[codigoProyectoExtension]"
+								level="INFO" doc:name="Logger" />
+	
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into proyecto_ext_CTI_investigador (i_cod_proyecto_ext,i_cod_grupo_investigacion) values(#[codigoProyectoExtension],#[codigoGrupo])]]></db:parameterized-query>
+							</db:insert>
+							
+							<choice doc:name="Choice">
+								<when expression="#[proyectosExtension[i-1].institucion != empty]">
+	
+									<set-variable variableName="institucion"
+										value="#[proyectosExtension[i-1].institucion]" doc:name="Variable" />
+										
+									<logger message="#[institucion]" level="INFO" doc:name="Logger" />
+									
+									<db:select config-ref="MySQL_Configuration" doc:name="Database">
+										<db:parameterized-query><![CDATA[select k_codigo from entidad where n_nombre=#[institucion]]]></db:parameterized-query>
+									</db:select>
+	
+									<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+									<choice doc:name="Choice">
+										<when expression="#[payload.size() ==0]">
+											<logger message="no existe institucion" level="INFO"
+												doc:name="Logger" />
+											<db:insert config-ref="MySQL_Configuration"
+												autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+												doc:name="Database">
+												<db:parameterized-query><![CDATA[insert into entidad (n_nombre,b_institucion) values(#[institucion],1)]]></db:parameterized-query>
+											</db:insert>
+	
+											<set-variable variableName="idInstitucion"
+												value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+										</when>
+										<otherwise>
+											<logger message="Institucion #[payload] ya existe"
+												level="INFO" doc:name="Logger" />
+	
+											<set-variable variableName="idInstitucion"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+										</otherwise>
+									</choice>
+									<logger message="#[idInstitucion]" level="INFO" doc:name="Logger" />
+									
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into proyecto_ext_CTI_entidad (i_cod_proyecto_ext_CTI,i_cod_entidad) values(#[codigoProyectoExtension],#[idInstitucion])]]></db:parameterized-query>
+									</db:insert>
+								</when>
+								<otherwise>
+									<logger message="Institucion nula" level="INFO" doc:name="Logger" />
+									
+								</otherwise>
+							</choice>
+							
+						</foreach>-->
+						<!-- //proyecto extension cti -->
+						
+						<!-- proyecto -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.proyecto != null]">
+								<set-session-variable variableName="proyectos"
+								value="#[grupoInvestigacion.proyecto]" doc:name="Session Variable" />
+		
+								<foreach collection="proyectos" doc:name="For Each"
+									counterVariableName="i" rootMessageVariableName="proyecto">
+									<set-variable variableName="proyecto" value="#[proyectos[i-1]]"
+										doc:name="Session Variable" />
+			
+									<logger message="#[proyectos[i-1].nombre]" level="INFO"
+										doc:name="Logger" />
+			
+									<choice doc:name="Choice">
+										<when expression="#[proyectos[i-1].institucion != empty]">
+			
+											<set-variable variableName="institucion"
+												value="#[proyectos[i-1].institucion]" doc:name="Variable" />
+												
+											<logger message="#[institucion]" level="INFO" doc:name="Logger" />
+											
+											<db:select config-ref="MySQL_Configuration" doc:name="Database">
+												<db:parameterized-query><![CDATA[select k_codigo from entidad where n_nombre=#[institucion]]]></db:parameterized-query>
+											</db:select>
+			
+											<logger message="#[payload]" level="INFO" doc:name="Logger" />
+			
+											<choice doc:name="Choice">
+												<when expression="#[payload.size() ==0]">
+													<logger message="no existe institucion" level="INFO"
+														doc:name="Logger" />
+													<db:insert config-ref="MySQL_Configuration"
+														autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+														doc:name="Database">
+														<db:parameterized-query><![CDATA[insert into entidad (n_nombre,b_institucion) values(#[institucion],1)]]></db:parameterized-query>
+													</db:insert>
+			
+													<set-variable variableName="idInstitucion"
+														value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+												</when>
+												<otherwise>
+													<logger message="Institucion #[payload] ya existe"
+														level="INFO" doc:name="Logger" />
+													<set-variable variableName="idInstitucion"
+														value="#[payload[0].k_codigo]" doc:name="Variable" />
+													
+												</otherwise>
+											</choice>
+											<logger message="#[idInstitucion]" level="INFO" doc:name="Logger" />
+											<db:insert config-ref="MySQL_Configuration"
+												autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+												doc:name="Database">
+												<db:parameterized-query><![CDATA[insert into proyecto(n_titulo,i_institucion,i_financiacion,b_acto_admin,i_ano,n_numero_contrato,i_tipo_proyecto,c_categoria,b_clasificado) 
+													values(#[proyecto.nombre],#[idInstitucion],(select k_codigo from financiacion_proyecto where n_nombre=#[proyecto.financiacion]),#[proyecto.actoAdmin],#[proyecto.anoInicio],#[proyecto.numeroContrato],(select k_codigo from tipo_proyecto where n_nombre=#[proyecto.tipo]),#[proyecto.categoria],#[proyecto.clasificado])]]></db:parameterized-query>
+											</db:insert>
+										</when>
+										<otherwise>
+											<logger message="Institucion nula" level="INFO" doc:name="Logger" />
+											<set-variable variableName="idInstitucion"
+														value="0" doc:name="Variable" />
+											<db:insert config-ref="MySQL_Configuration"
+												autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+												doc:name="Database">
+												<db:parameterized-query><![CDATA[insert into proyecto(n_titulo,i_financiacion,b_acto_admin,i_ano,n_numero_contrato,i_tipo_proyecto,c_categoria,b_clasificado) 
+													values(#[proyecto.nombre],(select k_codigo from financiacion_proyecto where n_nombre=#[proyecto.financiacion]),#[proyecto.actoAdmin],#[proyecto.anoInicio],#[proyecto.numeroContrato],(select k_codigo from tipo_proyecto where n_nombre=#[proyecto.tipo]),#[proyecto.categoria],#[proyecto.clasificado])]]></db:parameterized-query>
+											</db:insert>
+										</otherwise>
+									</choice>
+									
+			
+									
+									<logger message="#[payload]" level="INFO" doc:name="Logger" />
+									<set-variable variableName="codigoProyecto"
+										value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									<logger message="Codigo proyecto generado #[codigoProyecto]"
+										level="INFO" doc:name="Logger" />
+			
+			
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into proyecto_investigador (i_cod_proyecto,i_cod_grupo_investigacion) values(#[codigoProyecto],#[codigoGrupo])]]></db:parameterized-query>
+									</db:insert>
+								</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene proyecto" />
+						    </otherwise>
+					    </choice>
+						<!-- //proyecto -->
+						
+						<!-- red conocimiento -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.redConocimiento != null]">
+							<set-session-variable variableName="redesConocimiento"
+							value="#[grupoInvestigacion.redConocimiento]" doc:name="Session Variable" />
+	
+								<foreach collection="redesConocimiento" doc:name="For Each"
+									counterVariableName="i" rootMessageVariableName="redConocimiento">
+									<set-variable variableName="redConocimiento"
+										value="#[redesConocimiento[i-1]]" doc:name="Session Variable" />
+			
+									<logger message="#[redesConocimiento[i-1].nombre]" level="INFO"
+										doc:name="Logger" />
+			
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into red_conocimiento(n_nombre,c_lugar,i_ano_inicio,n_nombre_comunidad,n_pag_web,b_lider_red,c_categoria,b_clasificado,i_cod_grupo_investigacion) 
+											values(#[redConocimiento.nombre],#[redConocimiento.lugar],#[redConocimiento.ano],#[redConocimiento.nombreComunidad],#[redConocimiento.pagWeb],#[redConocimiento.liderRed],#[redConocimiento.categoria],#[redConocimiento.clasificado],#[codigoGrupo])]]></db:parameterized-query>
+									</db:insert>
+									<logger message="#[payload]" level="INFO" doc:name="Logger" />
+									<set-variable variableName="codigoRedConocimiento"
+										value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									<logger message="Codigo red conocimineto generado #[codigoRedConocimiento]"
+										level="INFO" doc:name="Logger" />
+			
+									<choice doc:name="Choice">
+										<when expression="#[redesConocimiento[i-1].instituciones != empty]">
+											<set-variable variableName="instituciones"
+												value="#[redesConocimiento[i-1].instituciones]" doc:name="Variable" />
+			
+											<foreach collection="instituciones" doc:name="For Each"
+												counterVariableName="j" rootMessageVariableName="institucion">
+												<set-variable variableName="institucion" value="#[instituciones[j-1]]"
+													doc:name="Variable" />
+			
+												<logger message="#[institucion.nombre]" level="INFO"
+													doc:name="Logger" />
+			
+												<db:select config-ref="MySQL_Configuration" doc:name="Database">
+													<db:parameterized-query><![CDATA[select k_codigo from entidad where n_nombre=#[institucion.nombre]]]></db:parameterized-query>
+												</db:select>
+			
+												<logger message="#[payload]" level="INFO" doc:name="Logger" />
+			
+												<choice doc:name="Choice">
+													<when expression="#[payload.size() ==0]">
+														<logger message="no existe investigador" level="INFO"
+															doc:name="Logger" />
+														<db:insert config-ref="MySQL_Configuration"
+															autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+															doc:name="Database">
+															<db:parameterized-query><![CDATA[insert into entidad (n_nombre,b_institucion) values(#[institucion.nombre],1)]]></db:parameterized-query>
+														</db:insert>
+			
+														<set-variable variableName="idEntidad"
+															value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+													</when>
+													<otherwise>
+														<logger message="Investigador #[payload] ya existe"
+															level="INFO" doc:name="Logger" />
+			
+														<set-variable variableName="idEntidad"
+															value="#[payload[0].k_codigo]" doc:name="Variable" />
+													</otherwise>
+												</choice>
+			
+												<logger message="#[idEntidad]" level="INFO" doc:name="Logger" />
+			
+												<db:insert config-ref="MySQL_Configuration"
+													autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+													doc:name="Database">
+													<db:parameterized-query><![CDATA[insert into red_conocimiento_entidad (i_cod_red_conocimiento,i_cod_entidad) values(#[codigoRedConocimiento],#[idEntidad])]]></db:parameterized-query>
+												</db:insert>
+											</foreach>
+										</when>
+										<otherwise>
+											<logger message="Institucion nula" level="INFO" doc:name="Logger" />
+										</otherwise>
+									</choice>
+								</foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene redConocimiento" />
+						    </otherwise>
+						</choice>
+						<!-- //red conocimiento -->
+						
+						<!-- secreto empresarial -->
+						
+						<!-- //secreto empresarial -->
+						
+						<!-- signo distintivo -->
+						
+						<!-- //signo distintivo -->
+						
+						<!-- software -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.software != null]">
+								<set-session-variable variableName="softwares" 
+								value="#[grupoInvestigacion.software]" doc:name="Session Variable"/>
+			                
+				                <foreach collection="softwares" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="software">
+							<set-variable variableName="software"
+								value="#[softwares[i-1]]" doc:name="Session Variable" />
+	
+							<logger message="#[softwares[i-1].nombre]" level="INFO"
+								doc:name="Logger" />
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into software (n_titulo,c_num_reg_derechos_autor,i_ano,n_descripcion,c_cod_proy_colciencias,b_certificacion,
+		                        c_categoria,b_clasificado) values(#[software.nombre],#[software.registroDerechosAutor],#[software.ano],#[software.descripcion],#[software.codigoProyectoColciencias],#[software.certificacion],#[software.categoria],#[software.clasificado])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoSoftware"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger message="Codigo software generado #[codigoSoftware]"
+								level="INFO" doc:name="Logger" />
+		                
+		                
+		                
+			                <set-variable variableName="autores" value="#[software.autores]"
+									doc:name="Variable" />
+		
+								<foreach collection="autores" doc:name="For Each"
+									counterVariableName="j" rootMessageVariableName="autor">
+									<set-variable variableName="autor" value="#[autores[j-1]]"
+										doc:name="Variable" />
+		
+									<logger message="#[autor.nombreCompleto]" level="INFO"
+										doc:name="Logger" />
+		
+									<db:select config-ref="MySQL_Configuration" doc:name="Database">
+										<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+									</db:select>
+		
+									<logger message="#[payload]" level="INFO" doc:name="Logger" />
+		
+									<choice doc:name="Choice">
+										<when expression="#[payload.size() ==0]">
+											<logger message="no existe investigador" level="INFO"
+												doc:name="Logger" />
+											<db:insert config-ref="MySQL_Configuration"
+												autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+												doc:name="Database">
+												<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+											</db:insert>
+		
+											<set-variable variableName="idAutor"
+												value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+										</when>
+										<otherwise>
+											<logger message="Investigador #[payload] ya existe"
+												level="INFO" doc:name="Logger" />
+		
+											<set-variable variableName="idAutor"
+												value="#[payload[0].k_codigo]" doc:name="Variable" />
+										</otherwise>
+									</choice>
+		
+									<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+		
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into software_autor (i_cod_software,i_cod_investigador,i_cod_grupo_investigacion,i_integrante_grupo,i_grupos_colaboracion) values(#[codigoSoftware],#[idAutor],#[codigoGrupo],#[autor.integranteGrupo],#[autor.gruposColaboracion])]]></db:parameterized-query>
+									</db:insert>
+								</foreach>
+		                </foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene software" />
+						    </otherwise>
+						</choice>
+						<!-- //software -->
+						
+						<!-- trabajo grado -->
+						<choice doc:name="Choice">
+							<when expression="#[grupoInvestigacion.trabajoDirigido != null]">
+								<set-session-variable variableName="trabajosGrado"
+								value="#[grupoInvestigacion.trabajoDirigido]" doc:name="Session Variable" />
+							
+								<foreach collection="trabajosGrado" doc:name="For Each"
+							counterVariableName="i" rootMessageVariableName="trabajoGrado">
+							<set-variable variableName="trabajoGrado"
+								value="#[trabajosGrado[i-1]]" doc:name="Session Variable" />
+	
+							<logger message="#[trabajosGrado[i-1].nombre]" level="INFO"
+								doc:name="Logger" />
+								
+							<set-variable variableName="institucion" value="#[trabajosGrado[i-1].institucion]"
+									doc:name="Variable" />
+	
+								<logger message="#[institucion]" level="INFO"
+									doc:name="Logger" />
+	
+								<db:select config-ref="MySQL_Configuration" doc:name="Database">
+									<db:parameterized-query><![CDATA[select k_codigo from entidad where n_nombre=#[institucion]]]></db:parameterized-query>
+								</db:select>
+	
+								<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	
+								<choice doc:name="Choice">
+									<when expression="#[payload.size() ==0]">
+										<logger message="no existe institucion" level="INFO"
+											doc:name="Logger" />
+										<db:insert config-ref="MySQL_Configuration"
+											autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+											doc:name="Database">
+											<db:parameterized-query><![CDATA[insert into entidad (n_nombre,b_institucion) values(#[institucion],1)]]></db:parameterized-query>
+										</db:insert>
+	
+										<set-variable variableName="idInstitucion"
+											value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+									</when>
+									<otherwise>
+										<logger message="Institucion #[payload] ya existe"
+											level="INFO" doc:name="Logger" />
+	
+										<set-variable variableName="idInstitucion"
+											value="#[payload[0].k_codigo]" doc:name="Variable" />
+									</otherwise>
+								</choice>
+	
+							<db:insert config-ref="MySQL_Configuration"
+								autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+								doc:name="Database">
+								<db:parameterized-query><![CDATA[insert into trabajo_grado (n_titulo,n_autor,i_institucion,i_ano,i_reconocimiento,i_tipo_trabajo,
+		                        c_categoria,b_clasificado) values(#[trabajoGrado.nombre],#[trabajoGrado.autorTrabajo],#[idInstitucion],#[trabajoGrado.anoFin],(select k_codigo from reconocimiento_trabajo_grado where n_nombre=#[trabajoGrado.valoracion]),(select k_codigo from tipo_trabajo where n_nombre=#[trabajoGrado.tipo]),#[trabajoGrado.categoria],#[trabajoGrado.clasificado])]]></db:parameterized-query>
+							</db:insert>
+							<logger message="#[payload]" level="INFO" doc:name="Logger" />
+							<set-variable variableName="codigoTrabajoGrado"
+								value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+							<logger message="Codigo trabajo grado generado #[codigoTrabajoGrado]"
+								level="INFO" doc:name="Logger" />
+	
+			                <set-variable variableName="autores" value="#[trabajoGrado.autores]"
+									doc:name="Variable" />
+		
+								<foreach collection="autores" doc:name="For Each"
+									counterVariableName="j" rootMessageVariableName="autor">
+									<set-variable variableName="autor" value="#[autores[j-1]]"
+										doc:name="Variable" />
+		
+									<logger message="#[autor.nombreCompleto]" level="INFO"
+										doc:name="Logger" />
+		
+									<db:select config-ref="MySQL_Configuration" doc:name="Database">
+										<db:parameterized-query><![CDATA[select k_codigo from investigador where n_nombre=#[autor.nombreCompleto]]]></db:parameterized-query>
+									</db:select>
+		
+									<logger message="#[payload]" level="INFO" doc:name="Logger" />
+		
+									<choice doc:name="Choice">
+										<when expression="#[payload.size() ==0]">
+											<logger message="no existe investigador" level="INFO"
+												doc:name="Logger" />
+											<db:insert config-ref="MySQL_Configuration"
+												autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+												doc:name="Database">
+												<db:parameterized-query><![CDATA[insert into investigador (n_nombre) values(#[autor.nombreCompleto])]]></db:parameterized-query>
+											</db:insert>
+		
+											<set-variable variableName="idAutor"
+												value="#[payload[0].GENERATED_KEY]" doc:name="Variable" />
+										</when>
+										<otherwise>
+											<logger message="Investigador #[payload] ya existe"
+												level="INFO" doc:name="Logger" />
+		
+											<set-variable variableName="idAutor"
+												value="#[payload[0].k_codigo]" doc:name="Variable" />
+										</otherwise>
+									</choice>
+		
+									<logger message="#[idAutor]" level="INFO" doc:name="Logger" />
+		
+									<db:insert config-ref="MySQL_Configuration"
+										autoGeneratedKeys="true" autoGeneratedKeysColumnIndexes="1"
+										doc:name="Database">
+										<db:parameterized-query><![CDATA[insert into trabajo_grado_director (i_cod_trabajo_grado,i_cod_investigador,b_director,i_cod_grupo_investigacion) values(#[codigoTrabajoGrado],#[idAutor],#[trabajoGrado.tipoDireccion=="Tutor principal"],#[codigoGrupo])]]></db:parameterized-query>
+									</db:insert>
+								</foreach>
+		                </foreach>
+							</when>
+							<otherwise>
+						        <logger level="INFO" doc:name="No tiene trabajoDirigido" />
+						    </otherwise>
+						</choice>
+						<!-- //trabajo grado -->
+					
+					</transactional>
 					<json:object-to-json-transformer
 						doc:name="Object to JSON" />
 					<scripting:component doc:name="Groovy">
